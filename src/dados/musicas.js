@@ -7,9 +7,6 @@
 /* Eu importo a versão da biblioteca preparada para o navegador. */
 import jsmediatags from 'jsmediatags/dist/jsmediatags.min.js'
 
-/* Eu importo a capa da música da Fatica. */
-import capaCoracao from '../assets/capas/coracao-modo-aviao.png'
-
 /* Eu importo as faixas de demonstração liberadas para publicação. */
 import { musicasDemonstracao } from './demonstracao'
 
@@ -227,25 +224,12 @@ export const musicasAutomaticas = Object.entries(arquivosDeAudio)
 /* BIBLIOTECA MANUAL                             */
 /* ============================================= */
 
-/* Eu localizo o áudio local da Fatica sem travar o projeto em outra máquina. */
+/* Eu localizo o áudio local desta música sem travar o projeto em outra máquina. */
 const audioFormulaMagica =
   arquivosDeAudio['../assets/musicas/formula-magica-da-paz.m4a'] ?? null
 
 /* Eu mantenho os cadastros manuais separados da biblioteca automática. */
 export const musicas = [
-
-  /* Eu cadastro a primeira música da Fatica. */
-  {
-    id: 1,
-    titulo: 'Meu Coração em Modo Avião',
-    artista: 'Fatica',
-    capa: capaCoracao,
-
-    /* Eu aguardo o áudio original dessa composição. */
-    audio: null,
-
-    categoria: 'Música independente'
-  },
 
   /* Eu cadastro a segunda música da Fatica. */
   {
