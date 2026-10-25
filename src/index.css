@@ -1,0 +1,55 @@
+/* ============================================= */
+/* M.O MUSIC - RESET MÍNIMO DO NAVEGADOR          */
+/* ARQUIVO: src/index.css                         */
+/* ============================================= */
+
+/* Eu preparo o documento para um player em tela cheia. */
+html {
+  color-scheme: dark;
+}
+
+/* Eu removo as margens padrão do navegador. */
+body {
+  margin: 0;
+}
+
+/* Eu ocupo toda a área disponível sem sobras. */
+#root {
+  height: 100%;
+}
+
+/* Eu herdo a caixa de conteúdo em todos os elementos. */
+* {
+  box-sizing: border-box;
+}
+
+/* Eu removo as margens padrão de parágrafos e títulos usados no app. */
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+/* Eu deixo a rolagem combinar com o tema escuro. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #4d4d4d transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #4d4d4d;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #6a6a6a;
+}

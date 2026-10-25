@@ -1,0 +1,2464 @@
+/* ============================================= */
+/* M.O MUSIC - DESIGN DA PLATAFORMA              */
+/* ARQUIVO: src/App.css                          */
+/* ============================================= */
+
+/* ============================================= */
+/* VARIÁVEIS DE IDENTIDADE                       */
+/* ============================================= */
+
+:root {
+  /* Fundo preto absoluto (entre os painéis). */
+  --cor-preto: #000000;
+
+  /* Fundo principal dos painéis. */
+  --cor-fundo: #121212;
+
+  /* Superfície elevada (cards e player). */
+  --cor-superficie: #181818;
+
+  /* Superfície em destaque no hover. */
+  --cor-hover: #282828;
+
+  /* Verde da marca. */
+  --cor-destaque: #1ed760;
+
+  /* Verde escuro dos botões. */
+  --cor-destaque-escura: #17ad4d;
+
+  /* Texto principal. */
+  --cor-texto: #ffffff;
+
+  /* Texto secundário. */
+  --cor-texto-secundario: #b3b3b3;
+
+  /* Borda sutil dos controles. */
+  --cor-borda: #2e2e2e;
+
+  /* Raio padrão dos elementos. */
+  --raio: 8px;
+
+  /* Sombra comum. */
+  --sombra: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+
+/* ============================================= */
+/* BASE                                          */
+/* ============================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+
+  /* Fonte do sistema (rápida e nativa). */
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  background: var(--cor-preto);
+  color: var(--cor-texto);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+input {
+  font: inherit;
+}
+
+img {
+  display: block;
+}
+
+/* Barra de rolagem discreta. */
+*::-webkit-scrollbar {
+  width: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #4d4d4d;
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #7a7a7a;
+  background-clip: content-box;
+}
+
+
+/* ============================================= */
+/* LAYOUT PRINCIPAL                              */
+/* ============================================= */
+
+/* Grid do aplicativo: lateral, conteúdo e player. */
+.aplicacao {
+  height: 100dvh;
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) 92px;
+  grid-template-areas:
+    'lateral principal'
+    'player player';
+  gap: 8px;
+  padding: 8px;
+  background: var(--cor-preto);
+}
+
+/* Painel de conteúdo com rolagem própria. */
+.painel-principal {
+  grid-area: principal;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--cor-fundo);
+  border-radius: var(--raio);
+}
+
+
+/* ============================================= */
+/* BARRA LATERAL                                 */
+/* ============================================= */
+
+.barra-lateral {
+  grid-area: lateral;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 12px 12px;
+  background: var(--cor-preto);
+  border-radius: var(--raio);
+  overflow-y: auto;
+}
+
+/* Logotipo da plataforma. */
+.logotipo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px 8px;
+}
+
+.logotipo-icone {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--cor-destaque);
+  color: #000;
+}
+
+.logotipo strong {
+  font-size: 20px;
+  letter-spacing: -0.4px;
+}
+
+/* Navegação principal. */
+.navegacao-principal {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.item-navegacao {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 14px;
+  border-radius: var(--raio);
+  color: var(--cor-texto-secundario);
+  font-weight: 600;
+  font-size: 15px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.item-navegacao:hover {
+  background: #1a1a1a;
+  color: var(--cor-texto);
+}
+
+.item-navegacao.ativo {
+  background: #1f1f1f;
+  color: var(--cor-texto);
+}
+
+/* Item que chama atenção: colocar música. */
+.item-navegacao.item-destaque {
+  color: var(--cor-destaque);
+}
+
+.item-navegacao.item-destaque:hover {
+  background: rgba(30, 215, 96, 0.12);
+  color: var(--cor-destaque);
+}
+
+/* Painel das playlists. */
+.painel-playlists {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--cor-superficie);
+  border-radius: var(--raio);
+  padding: 12px 8px;
+  min-height: 220px;
+}
+
+.cabecalho-playlists {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px 12px;
+  color: var(--cor-texto-secundario);
+}
+
+.cabecalho-playlists span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.botao-miniatura {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--cor-texto-secundario);
+  transition: background-color 0.2s, color 0.2s, transform 0.2s;
+}
+
+.botao-miniatura:hover {
+  background: #2f2f2f;
+  color: var(--cor-texto);
+  transform: scale(1.06);
+}
+
+.botao-miniatura svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Formulário rápido de playlist. */
+.formulario-playlist {
+  display: flex;
+  gap: 6px;
+  padding: 0 4px 10px;
+}
+
+.formulario-playlist input {
+  flex: 1;
+  min-width: 0;
+  background: #2a2a2a;
+  border: 1px solid var(--cor-borda);
+  border-radius: 6px;
+  color: var(--cor-texto);
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.formulario-playlist input:focus {
+  outline: 2px solid var(--cor-destaque);
+  border-color: transparent;
+}
+
+.formulario-playlist button {
+  background: var(--cor-destaque);
+  color: #000;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 0 12px;
+  border-radius: 20px;
+}
+
+/* Lista de playlists. */
+.lista-playlists {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+}
+
+.lista-playlists button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 10px;
+  border-radius: 6px;
+  color: var(--cor-texto-secundario);
+  font-size: 14px;
+  text-align: left;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.lista-playlists button:hover {
+  background: #242424;
+  color: var(--cor-texto);
+}
+
+.lista-playlists button.playlist-ativa {
+  background: #2a2a2a;
+  color: var(--cor-texto);
+}
+
+.lista-playlists small {
+  background: #3a3a3a;
+  color: var(--cor-texto-secundario);
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 11px;
+}
+
+.aviso-playlists {
+  margin: 4px 8px;
+  color: #6d6d6d;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+/* Rodapé da lateral. */
+.rodape-lateral {
+  margin: 0;
+  padding: 6px 12px;
+  color: #6d6d6d;
+  font-size: 12px;
+}
+
+
+/* ============================================= */
+/* TOPO DO CONTEÚDO                              */
+/* ============================================= */
+
+.topo-conteudo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: rgba(18, 18, 18, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  z-index: 10;
+}
+
+/* Botões redondos de navegação. */
+.botao-circular {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--cor-texto);
+  transition: transform 0.15s;
+}
+
+.botao-circular:not(:disabled):hover {
+  transform: scale(1.06);
+}
+
+.botao-circular svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Campo de busca do topo. */
+.campo-busca-topo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: 420px;
+  background: #242424;
+  border-radius: 24px;
+  padding: 0 14px;
+  color: var(--cor-texto-secundario);
+  border: 2px solid transparent;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.campo-busca-topo:focus-within {
+  border-color: var(--cor-texto);
+  background: #2a2a2a;
+}
+
+.campo-busca-topo svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.campo-busca-topo input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--cor-texto);
+  padding: 10px 0;
+  font-size: 14px;
+}
+
+.campo-busca-topo input::placeholder {
+  color: #9a9a9a;
+}
+
+.campo-busca-topo input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.campo-busca-topo > button {
+  display: grid;
+  place-items: center;
+  color: var(--cor-texto-secundario);
+  padding: 4px;
+}
+
+.campo-busca-topo > button:hover {
+  color: var(--cor-texto);
+}
+
+.campo-busca-topo > button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Perfil do usuário. */
+.chip-usuario {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #000;
+  color: var(--cor-texto);
+  padding: 5px 14px 5px 5px;
+  border-radius: 24px;
+  font-weight: 700;
+  font-size: 14px;
+  transition: transform 0.15s;
+}
+
+.chip-usuario:hover {
+  transform: scale(1.04);
+}
+
+.chip-usuario svg {
+  width: 26px;
+  height: 26px;
+  background: var(--cor-destaque);
+  color: #000;
+  border-radius: 50%;
+  padding: 4px;
+}
+
+
+/* ============================================= */
+/* ÁREA DE CONTEÚDO (ROLAGEM)                    */
+/* ============================================= */
+
+.conteudo {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 40px;
+  background:
+    linear-gradient(180deg, rgba(30, 215, 96, 0.08) 0, transparent 240px),
+    var(--cor-fundo);
+}
+
+.tela {
+  padding: 8px 24px 24px;
+}
+
+/* Cabeçalho colorido das telas internas. */
+.cabecalho-visao {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 6px;
+  min-height: 220px;
+  padding: 48px 24px 22px;
+  margin: -8px -24px 24px;
+  border-radius: 0 0 8px 8px;
+  background:
+    linear-gradient(180deg,
+      hsl(var(--matiz, 145), 42%, 26%) 0%,
+      hsl(var(--matiz, 145), 38%, 14%) 100%);
+}
+
+.rotulo-visao {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.cabecalho-visao h1 {
+  margin: 0;
+  font-size: clamp(32px, 6vw, 64px);
+  letter-spacing: -1.5px;
+  line-height: 1.05;
+}
+
+.cabecalho-visao p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+}
+
+.acoes-cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+/* Capa grande das telas (ícone). */
+.capa-visao-icone {
+  position: absolute;
+  right: 32px;
+  top: 32px;
+  display: grid;
+  place-items: center;
+  width: clamp(120px, 16vw, 200px);
+  height: clamp(120px, 16vw, 200px);
+  border-radius: 6px;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.15));
+  box-shadow: var(--sombra);
+  font-size: clamp(48px, 8vw, 90px);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.capa-visao-icone.coracao-grande {
+  background: linear-gradient(135deg, #4b1fd6, #b02be0);
+  color: #fff;
+}
+
+
+/* ============================================= */
+/* BOTÕES PADRÕES                                */
+/* ============================================= */
+
+/* Botão verde principal. */
+.botao-verde-grande {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--cor-destaque);
+  color: #000;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 14px 30px;
+  border-radius: 30px;
+  transition: transform 0.15s, background-color 0.2s;
+}
+
+.botao-verde-grande:hover {
+  background: var(--cor-destaque-escura);
+  transform: scale(1.04);
+}
+
+.botao-verde-grande:disabled {
+  background: #3a3a3a;
+  color: #8f8f8f;
+  transform: none;
+}
+
+.botao-verde-grande svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Botão secundário escuro. */
+.botao-secundario {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  border: 1px solid #5a5a5a;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 14px;
+  transition: border-color 0.2s, color 0.2s, transform 0.15s;
+}
+
+.botao-secundario:hover {
+  border-color: var(--cor-texto);
+  color: var(--cor-texto);
+  transform: scale(1.03);
+}
+
+.botao-secundario.botao-perigo {
+  border-color: #a34141;
+  color: #ff8a8a;
+}
+
+.botao-secundario.botao-perigo:hover {
+  border-color: #ff5c5c;
+  color: #ff5c5c;
+}
+
+/* Link discreto de "mostrar tudo". */
+.link-ver-tudo {
+  color: var(--cor-texto-secundario);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.link-ver-tudo:hover {
+  color: var(--cor-texto);
+  text-decoration: underline;
+}
+
+/* Botão redondo de ação (coração, mais...). */
+.botao-acao {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: var(--cor-texto-secundario);
+  opacity: 0;
+  transition: opacity 0.2s, color 0.2s, transform 0.15s, background-color 0.2s;
+}
+
+.botao-acao:hover {
+  color: var(--cor-texto);
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+.botao-acao.curtida {
+  color: var(--cor-destaque);
+  opacity: 1;
+}
+
+.botao-acao svg {
+  width: 20px;
+  height: 20px;
+}
+
+.botao-acao:disabled {
+  opacity: 0.3;
+}
+
+
+/* ============================================= */
+/* TELA: INÍCIO                                  */
+/* ============================================= */
+
+.saudacao-inicio h1 {
+  margin: 10px 0 18px;
+  font-size: clamp(26px, 4vw, 36px);
+  letter-spacing: -1px;
+}
+
+/* Chamada principal: colocar música. */
+.cta-minha-musica {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 26px 28px;
+  margin-bottom: 30px;
+  border-radius: 12px;
+  background:
+    linear-gradient(120deg, rgba(30, 215, 96, 0.16), rgba(30, 215, 96, 0.02)),
+    var(--cor-superficie);
+  border: 1px solid rgba(30, 215, 96, 0.35);
+}
+
+.icone-cta {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--cor-destaque);
+  color: #000;
+  font-size: 38px;
+}
+
+.texto-cta h2 {
+  margin: 0 0 6px;
+  font-size: clamp(20px, 3vw, 28px);
+  letter-spacing: -0.6px;
+}
+
+.texto-cta p {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: 15px;
+  line-height: 1.55;
+  max-width: 620px;
+}
+
+.cta-minha-musica .botao-verde-grande {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Grade de atalhos rápidos. */
+.grade-atalhos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 34px;
+}
+
+.card-atalho {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border-radius: var(--raio);
+  background: rgba(255, 255, 255, 0.07);
+  text-align: left;
+  transition: background-color 0.25s;
+}
+
+.card-atalho:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.icone-atalho {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #1ed760, #0b7a38);
+  color: #000;
+  font-size: 24px;
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.card-atalho strong {
+  font-size: 14.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* ============================================= */
+/* PRATELEIRAS (SEÇÕES DA TELA INICIAL)          */
+/* ============================================= */
+
+.prateleira {
+  margin-bottom: 34px;
+}
+
+.cabecalho-prateleira {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.cabecalho-prateleira h2 {
+  margin: 0;
+  font-size: clamp(20px, 2.6vw, 26px);
+  letter-spacing: -0.6px;
+}
+
+.contagem-resultados {
+  color: var(--cor-texto-secundario);
+  font-size: 13.5px;
+}
+
+/* Grade de cards musicais. */
+.grade-musicas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 16px;
+}
+
+.area-grade {
+  margin-top: 4px;
+}
+
+
+/* ============================================= */
+/* CARD MUSICAL                                  */
+/* ============================================= */
+
+.musica-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  transition: background-color 0.25s;
+  overflow: hidden;
+}
+
+.musica-card:hover {
+  background: var(--cor-hover);
+}
+
+.musica-card.em-reproducao {
+  background: var(--cor-hover);
+}
+
+/* Área da capa. */
+.capa-card {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.capa-card img,
+.capa-gradiente {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+}
+
+/* Capa gerada por degradê quando não existe imagem. */
+.capa-gradiente {
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(145deg,
+      hsl(var(--matiz, 145), 55%, 34%),
+      hsl(var(--matiz, 145), 45%, 12%));
+}
+
+.capa-gradiente span {
+  font-size: clamp(40px, 6vw, 64px);
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Botão verde que aparece no hover (como no Spotify). */
+.botao-play-card {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--cor-destaque);
+  color: #000;
+  opacity: 0;
+  transform: translateY(10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+  transition: opacity 0.25s, transform 0.25s, background-color 0.2s;
+}
+
+.musica-card:hover .botao-play-card,
+.musica-card.em-reproducao .botao-play-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.botao-play-card:hover {
+  background: var(--cor-destaque-escura);
+  transform: scale(1.06);
+}
+
+.botao-play-card svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Textos do card. */
+.musica-card h3 {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.musica-card p {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: 13.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Ações do card. */
+.acoes-card {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.musica-card:hover .acoes-card,
+.musica-card:focus-within .acoes-card {
+  opacity: 1;
+}
+
+.acoes-card .botao-acao {
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+}
+
+.acoes-card .botao-acao:hover {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.acoes-card .botao-acao.curtida {
+  color: var(--cor-destaque);
+}
+
+
+/* ============================================= */
+/* LISTA DE FAIXAS (LINHAS)                      */
+/* ============================================= */
+
+.lista-faixas {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cabeçalho das colunas. */
+.cabecalho-faixas,
+.linha-faixa {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 3fr) minmax(0, 2fr) 150px;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 16px;
+  border-radius: 6px;
+}
+
+.cabecalho-faixas {
+  color: var(--cor-texto-secundario);
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  margin-bottom: 6px;
+}
+
+.linha-faixa {
+  transition: background-color 0.15s;
+}
+
+.linha-faixa:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.linha-faixa.em-reproducao strong {
+  color: var(--cor-destaque);
+}
+
+/* Índice que vira botão de play. */
+.coluna-indice {
+  display: grid;
+  place-items: center;
+  color: var(--cor-texto-secundario);
+  font-size: 14px;
+}
+
+.botao-play-linha {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  color: var(--cor-texto-secundario);
+}
+
+.icone-play-faixa {
+  display: none;
+  color: var(--cor-texto);
+}
+
+.icone-play-faixa svg {
+  width: 18px;
+  height: 18px;
+}
+
+.linha-faixa:hover .numero-faixa {
+  display: none;
+}
+
+.linha-faixa:hover .icone-play-faixa {
+  display: grid;
+}
+
+.botao-play-linha:hover {
+  color: var(--cor-texto);
+}
+
+/* Coluna de título com capa miniatura. */
+.coluna-titulo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.capa-miniatura {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.capa-miniatura-gradiente {
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(145deg, hsl(var(--matiz, 145), 50%, 32%), #101010);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 18px;
+}
+
+.texto-faixa {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.texto-faixa strong {
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.texto-faixa small {
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.coluna-categoria {
+  color: var(--cor-texto-secundario);
+  font-size: 13.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.coluna-acoes {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.coluna-acoes .botao-acao {
+  opacity: 0;
+}
+
+.linha-faixa:hover .coluna-acoes .botao-acao,
+.coluna-acoes .botao-acao.curtida {
+  opacity: 1;
+}
+
+/* Indicador animado de reprodução. */
+.indicador-tocando {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 16px;
+}
+
+.indicador-tocando i {
+  width: 3px;
+  background: var(--cor-destaque);
+  border-radius: 2px;
+  animation: barras 0.9s ease-in-out infinite;
+}
+
+.indicador-tocando i:nth-child(1) { height: 40%; animation-delay: 0s; }
+.indicador-tocando i:nth-child(2) { height: 100%; animation-delay: 0.2s; }
+.indicador-tocando i:nth-child(3) { height: 65%; animation-delay: 0.4s; }
+.indicador-tocando i:nth-child(4) { height: 85%; animation-delay: 0.1s; }
+
+@keyframes barras {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+
+
+/* ============================================= */
+/* RANQUEADAS E ARTISTAS                         */
+/* ============================================= */
+
+.lista-ranqueada {
+  display: flex;
+  flex-direction: column;
+}
+
+.linha-ranqueada {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  transition: background-color 0.15s;
+}
+
+.linha-ranqueada:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.linha-ranqueada.em-reproducao strong {
+  color: var(--cor-destaque);
+}
+
+.numero-ranque {
+  width: 26px;
+  text-align: center;
+  color: var(--cor-texto-secundario);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.info-ranque {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.info-ranque strong {
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.info-ranque small {
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+}
+
+.contador-ranque {
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.etiqueta-tocando {
+  background: rgba(30, 215, 96, 0.15);
+  color: var(--cor-destaque);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+/* Grade de artistas. */
+.grade-artistas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.card-artista {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 18px 12px;
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  text-align: center;
+  transition: background-color 0.25s;
+}
+
+.card-artista:hover {
+  background: var(--cor-hover);
+}
+
+.retrato-artista {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  margin-bottom: 10px;
+  border-radius: 50%;
+  background:
+    linear-gradient(145deg,
+      hsl(var(--matiz, 145), 55%, 36%),
+      hsl(var(--matiz, 145), 45%, 14%));
+  font-size: 40px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.card-artista strong {
+  font-size: 14.5px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-artista small {
+  color: var(--cor-texto-secundario);
+  font-size: 12.5px;
+}
+
+
+/* ============================================= */
+/* ESTADOS VAZIOS E AÇÕES GLOBAIS                */
+/* ============================================= */
+
+.estado-vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.estado-vazio h3 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.5px;
+}
+
+.estado-vazio p {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: 15px;
+}
+
+.icone-vazio {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #232323;
+  color: var(--cor-texto-secundario);
+  font-size: 32px;
+  margin-bottom: 6px;
+}
+
+.area-carregar-mais {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.area-acao-principal {
+  display: flex;
+  justify-content: center;
+  margin-top: 26px;
+}
+
+.contador-exibicao {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+}
+
+.dica-playlist {
+  margin-top: 20px;
+  padding: 14px 18px;
+  border-radius: var(--raio);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--cor-texto-secundario);
+  font-size: 13.5px;
+}
+
+.dica-playlist p {
+  margin: 0;
+}
+
+.dica-playlist strong {
+  color: var(--cor-texto);
+}
+
+
+/* ============================================= */
+/* FORMULÁRIO: COLOCAR MINHA MÚSICA              */
+/* ============================================= */
+
+.secao-adicionar-musica {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.cabecalho-secao h2 {
+  margin: 0 0 8px;
+  font-size: clamp(22px, 3vw, 30px);
+  letter-spacing: -0.7px;
+}
+
+.cabecalho-secao p {
+  margin: 0 0 22px;
+  color: var(--cor-texto-secundario);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.formulario-musica {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: 14px;
+  padding: 24px;
+}
+
+/* Área larga de arrastar e soltar. */
+.area-solta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 42px 20px;
+  border: 2px dashed #4f4f4f;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s, transform 0.15s;
+}
+
+.area-solta:hover {
+  border-color: var(--cor-destaque);
+  background: rgba(30, 215, 96, 0.05);
+}
+
+.area-solta.arrastando {
+  border-color: var(--cor-destaque);
+  background: rgba(30, 215, 96, 0.12);
+  transform: scale(1.01);
+}
+
+.icone-solta {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: rgba(30, 215, 96, 0.15);
+  color: var(--cor-destaque);
+  margin-bottom: 6px;
+}
+
+.area-solta strong {
+  font-size: 18px;
+}
+
+.area-solta small {
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+}
+
+/* Lista de arquivos escolhidos. */
+.lista-arquivos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.lista-arquivos li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #232323;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.lista-arquivos li > svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--cor-destaque);
+}
+
+.lista-arquivos li span {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lista-arquivos li button {
+  display: grid;
+  place-items: center;
+  color: var(--cor-texto-secundario);
+  padding: 4px;
+  border-radius: 50%;
+}
+
+.lista-arquivos li button:hover {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.12);
+}
+
+.lista-arquivos li button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Campos de personalização. */
+.campos-personalizacao {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.campo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo-form label {
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.campo-form input {
+  background: #2a2a2a;
+  border: 1px solid var(--cor-borda);
+  border-radius: 8px;
+  color: var(--cor-texto);
+  padding: 12px 14px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.campo-form input:focus {
+  outline: none;
+  border-color: var(--cor-destaque);
+}
+
+.campo-form input[type='file'] {
+  font-size: 13px;
+}
+
+/* Eu deixo o campo da letra ocupar a largura toda. */
+.campo-letra {
+  grid-column: 1 / -1;
+}
+
+.campo-letra textarea {
+  width: 100%;
+  resize: vertical;
+  background: #2a2a2a;
+  border: 1px solid var(--cor-borda);
+  border-radius: 8px;
+  color: var(--cor-texto);
+  padding: 12px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.6;
+  transition: border-color 0.2s;
+}
+
+.campo-letra textarea:focus {
+  outline: none;
+  border-color: var(--cor-destaque);
+}
+
+.ajuda-campo {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+/* Eu organizo a seção de venda e apoio. */
+.campos-venda {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border: 1px dashed var(--cor-borda);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.texto-venda h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+.texto-venda p {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.grade-venda {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.aviso-formulario {
+  margin: 0;
+  color: var(--cor-destaque);
+  font-size: 13.5px;
+}
+
+.botao-enviar {
+  align-self: center;
+}
+
+
+/* ============================================= */
+/* PLAYER MUSICAL (BARRA INFERIOR)               */
+/* ============================================= */
+
+.player-musical {
+  grid-area: player;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(320px, 2fr) minmax(180px, 1fr);
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
+  background: var(--cor-superficie);
+  border-radius: var(--raio);
+}
+
+.zona-player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.zona-central {
+  flex-direction: column;
+  gap: 4px;
+  justify-self: center;
+  width: 100%;
+  max-width: 620px;
+}
+
+.zona-direita {
+  justify-content: flex-end;
+}
+
+/* Capa da faixa atual. */
+.capa-player {
+  width: 56px;
+  height: 56px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.capa-player-gradiente {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, #1ed760, #0b5c2c);
+  color: #000;
+  font-size: 26px;
+  box-shadow: none;
+}
+
+/* Informações da faixa. */
+.info-player {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.info-player strong {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.info-player small {
+  color: var(--cor-texto-secundario);
+  font-size: 12.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.zona-esquerda .botao-acao {
+  opacity: 1;
+  flex-shrink: 0;
+}
+
+/* Controles de reprodução. */
+.controles-reproducao {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.botao-controle {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: var(--cor-texto-secundario);
+  transition: color 0.15s, transform 0.15s;
+}
+
+.botao-controle:hover {
+  color: var(--cor-texto);
+  transform: scale(1.08);
+}
+
+.botao-controle.ativo {
+  color: var(--cor-destaque);
+}
+
+.botao-controle.ativo:hover {
+  color: var(--cor-destaque);
+}
+
+.botao-controle svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Botão principal verde/branco. */
+.botao-principal {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--cor-texto);
+  color: #000;
+  transition: transform 0.15s, background-color 0.2s;
+}
+
+.botao-principal:hover {
+  transform: scale(1.07);
+}
+
+.botao-principal:disabled:hover {
+  transform: none;
+}
+
+.botao-principal svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Barra de progresso. */
+.progresso-musical {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.progresso-musical span {
+  color: var(--cor-texto-secundario);
+  font-size: 11.5px;
+  min-width: 38px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.barra-progresso-player {
+  flex: 1;
+}
+
+/* Volume. */
+.barra-volume {
+  width: 96px;
+}
+
+
+/* ============================================= */
+/* BARRAS DESLIZANTES (RANGE)                    */
+/* ============================================= */
+
+.barra-progresso-player,
+.barra-volume {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(
+    to right,
+    var(--cor-texto) 0%,
+    var(--cor-texto) var(--progresso, 0%),
+    #4d4d4d var(--progresso, 0%),
+    #4d4d4d 100%
+  );
+  cursor: pointer;
+}
+
+.barra-progresso-player:disabled {
+  background: #4d4d4d;
+  cursor: not-allowed;
+}
+
+/* Polegar dos controles. */
+.barra-progresso-player::-webkit-slider-thumb,
+.barra-volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--cor-texto);
+  opacity: 0;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.barra-progresso-player:hover::-webkit-slider-thumb,
+.barra-volume:hover::-webkit-slider-thumb {
+  opacity: 1;
+}
+
+.barra-progresso-player:active::-webkit-slider-thumb,
+.barra-volume:active::-webkit-slider-thumb {
+  opacity: 1;
+  transform: scale(1.25);
+}
+
+.barra-progresso-player::-moz-range-thumb,
+.barra-volume::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 50%;
+  background: var(--cor-texto);
+  opacity: 0;
+}
+
+.barra-progresso-player:hover::-moz-range-thumb,
+.barra-volume:hover::-moz-range-thumb {
+  opacity: 1;
+}
+
+
+/* ============================================= */
+/* PAINEL DA FILA                                */
+/* ============================================= */
+
+.painel-fila {
+  position: absolute;
+  right: 12px;
+  bottom: calc(100% + 12px);
+  width: 340px;
+  max-height: 380px;
+  display: flex;
+  flex-direction: column;
+  background: #1b1b1b;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  box-shadow: var(--sombra);
+  overflow: hidden;
+  z-index: 50;
+}
+
+.painel-fila header {
+  padding: 16px 18px 10px;
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.painel-fila h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.painel-fila header small {
+  color: var(--cor-texto-secundario);
+  font-size: 12.5px;
+}
+
+.painel-fila ul {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  overflow-y: auto;
+}
+
+.painel-fila li {
+  padding: 8px 10px;
+  border-radius: 6px;
+}
+
+.painel-fila li:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.faixa-fila {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.faixa-fila strong {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.faixa-fila small {
+  color: var(--cor-texto-secundario);
+  font-size: 12.5px;
+}
+
+.aviso-fila {
+  margin: 0;
+  padding: 18px;
+  color: var(--cor-texto-secundario);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+
+/* ============================================= */
+/* BOTÕES DE COMPARTILHAR, LETRA E COMPRA        */
+/* ============================================= */
+
+/* Eu deixo o botão verde genérico pronto. */
+.botao-verde {
+  align-self: flex-start;
+  background: var(--cor-destaque);
+  color: #000;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 11px 22px;
+  border-radius: 999px;
+  transition: transform 0.15s, filter 0.2s;
+}
+
+.botao-verde:hover:not(:disabled) {
+  transform: scale(1.04);
+  filter: brightness(1.08);
+}
+
+.botao-verde:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* Eu destaco o botão ativo (letra aberta). */
+.botao-acao.ativo {
+  color: var(--cor-destaque);
+  opacity: 1;
+}
+
+/* Eu pinto de verde o botão de compra nos cards e linhas. */
+.botao-acao-destaque {
+  color: var(--cor-destaque);
+  opacity: 1;
+}
+
+/* Eu formato o botão de compra no player. */
+.botao-apoiar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border: 1.5px solid var(--cor-destaque);
+  border-radius: 999px;
+  color: var(--cor-destaque);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background-color 0.2s, color 0.2s, transform 0.15s;
+}
+
+.botao-apoiar:hover {
+  background: var(--cor-destaque);
+  color: #000;
+  transform: scale(1.04);
+}
+
+.botao-apoiar svg {
+  width: 16px;
+  height: 16px;
+}
+
+
+/* ============================================= */
+/* AVISO RÁPIDO (TOAST)                          */
+/* ============================================= */
+
+.aviso-global {
+  position: fixed;
+  left: 50%;
+  bottom: 108px;
+  transform: translateX(-50%);
+  z-index: 300;
+  max-width: min(92vw, 520px);
+  padding: 13px 22px;
+  background: #fff;
+  color: #111;
+  font-size: 14.5px;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 999px;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.55);
+  animation: aviso-entrar 0.28s ease;
+}
+
+@keyframes aviso-entrar {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+
+/* ============================================= */
+/* PAINEL DA LETRA                               */
+/* ============================================= */
+
+.painel-letra {
+  position: absolute;
+  right: 12px;
+  bottom: calc(100% + 12px);
+  width: 380px;
+  max-height: 460px;
+  display: flex;
+  flex-direction: column;
+  background: #1b1b1b;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  box-shadow: var(--sombra);
+  overflow: hidden;
+  z-index: 60;
+}
+
+.painel-letra header {
+  padding: 16px 18px 10px;
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.painel-letra h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.painel-letra header small {
+  display: block;
+  margin-top: 2px;
+  color: var(--cor-texto-secundario);
+  font-size: 12.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.texto-letra {
+  padding: 18px;
+  margin: 0;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #e8e8e8;
+  font-size: 15.5px;
+  font-weight: 500;
+  line-height: 1.75;
+}
+
+.texto-letra-aviso {
+  color: var(--cor-texto-secundario);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.formulario-letra {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 18px 18px;
+}
+
+.formulario-letra p {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.formulario-letra textarea {
+  width: 100%;
+  resize: vertical;
+  background: #2a2a2a;
+  border: 1px solid var(--cor-borda);
+  border-radius: 8px;
+  color: var(--cor-texto);
+  padding: 12px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.formulario-letra textarea:focus {
+  outline: none;
+  border-color: var(--cor-destaque);
+}
+
+
+/* ============================================= */
+/* MODAL DE PLAYLISTS                            */
+/* ============================================= */
+
+.fundo-modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  padding: 20px;
+}
+
+.modal-playlists {
+  width: 100%;
+  max-width: 440px;
+  max-height: 86vh;
+  overflow-y: auto;
+  background: #1b1b1b;
+  border: 1px solid var(--cor-borda);
+  border-radius: 14px;
+  box-shadow: var(--sombra);
+  padding: 20px;
+}
+
+.cabecalho-modal {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.cabecalho-modal h2 {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: -0.4px;
+}
+
+.cabecalho-modal p {
+  margin: 4px 0 0;
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+}
+
+.botao-icone {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: var(--cor-texto-secundario);
+}
+
+.botao-icone:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--cor-texto);
+}
+
+.botao-icone svg {
+  width: 18px;
+  height: 18px;
+}
+
+.opcoes-playlists {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+}
+
+.opcao-playlist {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  text-align: left;
+  transition: background-color 0.15s;
+}
+
+.opcao-playlist:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.opcao-playlist > span:last-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.opcao-playlist strong {
+  font-size: 14.5px;
+}
+
+.opcao-playlist small {
+  color: var(--cor-texto-secundario);
+  font-size: 12.5px;
+}
+
+.miniatura-playlist {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: linear-gradient(145deg, #1ed760, #0b5c2c);
+  color: #000;
+  font-size: 18px;
+}
+
+.miniatura-playlist.coracao {
+  background: linear-gradient(145deg, #4b1fd6, #b02be0);
+  color: #fff;
+}
+
+.miniatura-playlist.coracao svg {
+  width: 20px;
+  height: 20px;
+}
+
+.opcao-especial {
+  margin-bottom: 10px;
+}
+
+.nova-playlist-modal {
+  display: flex;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nova-playlist-modal input {
+  flex: 1;
+  min-width: 0;
+  background: #2a2a2a;
+  border: 1px solid var(--cor-borda);
+  border-radius: 8px;
+  color: var(--cor-texto);
+  padding: 11px 14px;
+  font-size: 14px;
+}
+
+.nova-playlist-modal input:focus {
+  outline: none;
+  border-color: var(--cor-destaque);
+}
+
+.nova-playlist-modal button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--cor-destaque);
+  color: #000;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 0 18px;
+  border-radius: 24px;
+}
+
+.nova-playlist-modal button svg {
+  width: 18px;
+  height: 18px;
+}
+
+
+/* ============================================= */
+/* NAVEGAÇÃO INFERIOR (CELULAR)                  */
+/* ============================================= */
+
+.nav-inferior {
+  display: none;
+}
+
+
+/* ============================================= */
+/* RESPONSIVIDADE                                */
+/* ============================================= */
+
+/* Telas médias: lateral mais estreita. */
+@media (max-width: 1100px) {
+  .aplicacao {
+    grid-template-columns: 250px minmax(0, 1fr);
+  }
+}
+
+/* Celular: barra lateral vira navegação inferior. */
+@media (max-width: 860px) {
+  .aplicacao {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      'principal'
+      'player'
+      'nav';
+    padding: 0;
+    gap: 0;
+  }
+
+  .barra-lateral {
+    display: none;
+  }
+
+  .painel-principal {
+    border-radius: 0;
+  }
+
+  .nav-inferior {
+    grid-area: nav;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+    background: #101010;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .nav-inferior button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    color: var(--cor-texto-secundario);
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 8px;
+  }
+
+  .nav-inferior button.ativo {
+    color: var(--cor-texto);
+  }
+
+  .nav-inferior svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Player compacto no celular. */
+  .player-musical {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 0;
+    height: 68px;
+  }
+
+  .zona-central {
+    flex-direction: row;
+    max-width: none;
+    width: auto;
+    order: 2;
+  }
+
+  .zona-central .progresso-musical,
+  .zona-central .controles-reproducao .botao-controle:first-child,
+  .zona-central .controles-reproducao .botao-controle:last-child {
+    display: none;
+  }
+
+  .zona-direita {
+    display: none;
+  }
+
+  .zona-esquerda {
+    order: 1;
+  }
+
+  .capa-player {
+    width: 48px;
+    height: 48px;
+  }
+
+  .botao-principal {
+    width: 40px;
+    height: 40px;
+  }
+
+  .painel-fila {
+    right: 8px;
+    width: calc(100vw - 32px);
+  }
+
+  .painel-letra {
+    right: 8px;
+    width: calc(100vw - 32px);
+    max-height: 55vh;
+  }
+
+  .tela {
+    padding: 8px 16px 24px;
+  }
+
+  .cabecalho-visao {
+    margin: -8px -16px 20px;
+    padding: 40px 16px 20px;
+    min-height: 180px;
+  }
+
+  .capa-visao-icone {
+    display: none;
+  }
+
+  /* Chamada principal empilha no celular. */
+  .cta-minha-musica {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 16px;
+  }
+
+  .cta-minha-musica .botao-verde-grande {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Celular pequeno: listas simplificadas. */
+@media (max-width: 640px) {
+  .cabecalho-faixas,
+  .linha-faixa {
+    grid-template-columns: 32px minmax(0, 1fr) 138px;
+    gap: 10px;
+    padding: 8px 10px;
+  }
+
+  /* Eu deixo os quatro botões caberem no celular. */
+  .coluna-acoes .botao-acao {
+    width: 30px;
+    height: 30px;
+  }
+
+  .coluna-acoes .botao-acao svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .coluna-categoria {
+    display: none;
+  }
+
+  .cabecalho-faixas .coluna-categoria {
+    display: none;
+  }
+
+  .grade-musicas {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  .musica-card {
+    padding: 10px;
+  }
+
+  /* No celular os botões ficam sempre visíveis. */
+  .botao-play-card {
+    opacity: 1;
+    transform: none;
+    width: 42px;
+    height: 42px;
+  }
+
+  .acoes-card {
+    opacity: 1;
+  }
+
+  .chip-usuario span {
+    display: none;
+  }
+
+  .topo-conteudo {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .contador-ranque {
+    display: none;
+  }
+}

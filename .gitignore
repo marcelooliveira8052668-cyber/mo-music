@@ -1,0 +1,30 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Biblioteca musical local do usuário (660 arquivos / 3,6 GB).
+# Nunca vai para o GitHub: o repositório público usa apenas as
+# faixas royalty-free de src/assets/demonstracao/.
+src/assets/musicas/*
+!src/assets/musicas/.gitkeep
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
