@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Chaves locais de serviços opcionais (nuvem) — nunca vão para o repositório.
+.env
+.env.*
+!.env.example
+
 # Biblioteca musical local do usuário (660 arquivos / 3,6 GB).
 # Nunca vai para o GitHub: o repositório público usa apenas as
 # faixas royalty-free de src/assets/demonstracao/.

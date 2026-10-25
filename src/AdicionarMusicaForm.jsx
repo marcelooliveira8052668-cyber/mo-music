@@ -866,6 +866,41 @@ function AdicionarMusicaForm() {
             : 'Adicionar à minha biblioteca'}
         </button>
 
+
+        {/* ================================= */}
+        {/* OBSERVAÇÃO DE ARMAZENAMENTO       */}
+        {/* ================================= */}
+
+        {/* Eu explico o armazenamento para quem usa e para quem gere o site. */}
+        <details className="obs-armazenamento">
+          <summary>
+            💾 Como suas músicas ficam guardadas (e como ativar a nuvem)
+          </summary>
+
+          <ul>
+            <li>
+              <strong>Neste aparelho:</strong> ao anexar, a música é copiada
+              para o banco de dados local do navegador (IndexedDB) — sobrevive
+              a fechar o PC, reiniciar e atualizar o site. Nada sai daqui.
+            </li>
+            <li>
+              <strong>Modo pasta (Chrome/Edge):</strong> conecta direto na sua
+              pasta, sem copiar e sem gastar espaço.
+            </li>
+            <li>
+              <strong>Excluir:</strong> só quem anexou vê o botão de apagar —
+              quem recebe o link apenas ouve e compra.
+            </li>
+            <li>
+              <strong>Nuvem (opcional):</strong> para as músicas tocarem no
+              celular de quem recebe o link, elas precisam ser publicadas num
+              serviço de nuvem com banco de dados (ex.: Supabase). Quem tem o
+              código do site encontra o passo a passo no README, seção
+              "Armazenamento e banco de dados".
+            </li>
+          </ul>
+        </details>
+
       </form>
     </section>
   )

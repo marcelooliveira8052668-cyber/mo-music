@@ -42,7 +42,8 @@ import {
   CHAVES,
   estiloDeGradiente,
   saudacaoDoDia,
-  compartilharMusica
+  compartilharMusica,
+  ehAnexadaMinha
 } from './utilitarios'
 
 /* Eu importo os ícones da interface. */
@@ -158,6 +159,9 @@ function App() {
   /* Eu mostro avisos rápidos na parte inferior da tela. */
   const [avisoGlobal, setAvisoGlobal] = useState('')
 
+  /* Eu controlo o painel informativo do botão Visitante. */
+  const [painelVisitante, setPainelVisitante] = useState(false)
+
 
   /* =========================================== */
   /* REFERÊNCIAS                                */
@@ -251,6 +255,12 @@ function App() {
       .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
 
   }, [listaMusicas])
+
+  /* Eu conto as músicas anexadas neste aparelho para o painel do visitante. */
+  const totalAnexadas = useMemo(
+    () => listaMusicas.filter((musica) => ehAnexadaMinha(musica)).length,
+    [listaMusicas]
+  )
 
   /* Eu seleciono as músicas visíveis na tela. */
   const musicasVisiveis = musicasFiltradas.slice(0, limiteVisivel)
@@ -1419,11 +1429,70 @@ function App() {
 
             </div>
 
-            {/* Eu mostro o perfil do visitante. */}
-            <button type="button" className="chip-usuario" title="Visitante">
-              <IconeUsuario />
-              <span>Visitante</span>
-            </button>
+            {/* Eu mostro o perfil do visitante com painel funcional. */}
+            <div className="area-usuario">
+
+              <button
+                type="button"
+                className="chip-usuario"
+                title="Sessão de visitante"
+                aria-haspopup="dialog"
+                aria-expanded={painelVisitante}
+                onClick={() => setPainelVisitante((aberto) => !aberto)}
+              >
+                <IconeUsuario />
+                <span>Visitante</span>
+              </button>
+
+              {/* Eu abro o painel com a explicação da sessão. */}
+              {painelVisitante && (
+
+                <>
+
+                  {/* Eu fecho o painel ao clicar fora. */}
+                  <div
+                    className="fundo-modal"
+                    onClick={() => setPainelVisitante(false)}
+                  />
+
+                  <div className="painel-visitante" role="dialog" aria-label="Sessão de visitante">
+
+                    {/* Eu identifico o modo de uso. */}
+                    <strong>Visitante — sem cadastro</strong>
+
+                    {/* Eu explico como os dados ficam. */}
+                    <p>
+                      Favoritas, playlists e músicas anexadas ficam guardadas{' '}
+                      <strong>neste aparelho</strong> — não precisam de conta
+                      e nunca saem daqui.
+                    </p>
+
+                    {/* Eu mostro o contador de anexadas. */}
+                    <p>
+                      {totalAnexadas > 0
+                        ? `${totalAnexadas} ${totalAnexadas === 1 ? 'música anexada' : 'músicas anexadas'} neste aparelho.`
+                        : 'Nenhuma música anexada ainda.'}
+                    </p>
+
+                    {/* Eu ofereço o atalho para colocar músicas. */}
+                    <button
+                      type="button"
+                      className="botao-secundario"
+                      onClick={() => {
+                        setPainelVisitante(false)
+                        irPara('anexar')
+                      }}
+                    >
+                      Colocar minha música
+                    </button>
+
+                  </div>
+
+                </>
+
+              )}
+
+            </div>
 
           </header>
 

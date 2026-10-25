@@ -140,6 +140,66 @@ As 5 faixas de demonstração (Kevin MacLeod, CC BY 4.0) servem de vitrine. Para
 
 ---
 
+## 🗄️ Armazenamento e banco de dados (guia de quem comprou o site)
+
+> **Obs do vendedor:** quem comprar o site **faz todo o trâmite sozinho** — os passos abaixo são o roteiro completo. A publicação na nuvem é opcional: o site funciona sem ela (músicas guardadas em cada aparelho).
+
+### Como o app guarda música hoje — sem servidor
+
+| O que | Onde fica | Até quando |
+|---|---|---|
+| Músicas anexadas (metadados + arquivo) | **IndexedDB**, banco `momusic-dados`, loja `anexadas` | Até o dono apagar (botão de excluir) ou limpar os dados do navegador |
+| Pasta conectada (Chrome/Edge) | Handle salvo na loja `chaves` do mesmo banco | Enquanto o navegador lembrar a permissão |
+| Favoritas, playlists, histórico, preferências | **localStorage** com prefixo `momusic:` | Enquanto não limpar o navegador |
+
+- O **IndexedDB** é o "banco de dados" do navegador: guarda textos **e arquivos grandes (Blob)**, sobrevive a fechar o PC, reiniciar e atualizar o site.
+- **Nenhum arquivo sai do aparelho** de quem anexou — por isso o link aberto em outro celular mostra apenas as faixas de demonstração.
+
+### O trâmite para ativar a publicação na nuvem (opcional)
+
+Para as músicas publicadas tocarem em **outros aparelhos** (celular de quem recebe o link), elas precisam morar numa nuvem com banco de dados. **Quem comprou o site faz os 5 passos:**
+
+1. **Crie a conta grátis** em [supabase.com](https://supabase.com) → **New Project** (nome `mo-music`, senha forte, região *South America (São Paulo)*).
+2. **Rode o SQL** no **SQL Editor** do Supabase (colar e clicar em Run) — cria a tabela e as regras de segurança:
+
+```sql
+-- Tabela das músicas publicadas no catálogo público
+create table if not exists musicas_publicadas (
+  id text primary key,
+  titulo text not null,
+  artista text not null,
+  categoria text,
+  apoio text,
+  preco numeric,
+  letra text,
+  arquivo_url text not null,
+  capa_url text,
+  tamanho bigint,
+  dono uuid,
+  criado_em timestamptz default now()
+);
+
+alter table musicas_publicadas enable row level security;
+
+-- Quem abre o site ouve (leitura pública)
+create policy "leitura_publica" on musicas_publicadas
+  for select to anon using (true);
+
+-- Só quem está logado na conta do dono publica, edita e apaga
+create policy "dono_administra" on musicas_publicadas
+  for all to authenticated
+  using (auth.uid() = dono)
+  with check (auth.uid() = dono);
+```
+
+3. **Copie as chaves**: em *Project Settings → API*, pegue a **Project URL** e a **anon public** key.
+4. **Preencha o `.env`**: copie `.env.example` para `.env` na raiz do projeto e cole os dois valores. O Git ignora o `.env` (nunca vai para o repositório).
+5. **Implemente o botão "Publicar"** (Fase 2 abaixo): login com e-mail/senha via *Supabase Auth*, upload do arquivo para o *Storage* (`musicas/{id}/{arquivo}`) e um *insert* na tabela — já criada com as regras acima. É trabalho de poucas horas para quem desenvolve, e o banco já estará pronto.
+
+> **Segurança:** a chave anon é feita para o navegador e é pública de propósito — a proteção vem das **regras (RLS)** do passo 2: anônimo (quem recebe o link) **só lê**; escreve e apaga **apenas a conta do dono**, logada. É o que garante que "só quem publicou pode excluir".
+
+---
+
 ## 🗺️ Fase 2 — Monetização real (roadmap)
 
 Hoje o pagamento acontece **direto entre ouvinte e artista** (Pix/link de compra), o que já permite vender e apoiar sem custo para a plataforma. Para escalar:
@@ -148,7 +208,7 @@ Hoje o pagamento acontece **direto entre ouvinte e artista** (Pix/link de compra
 2. **Entrega automática** do arquivo após a confirmação do pagamento
 3. **Página de artista** com link público (`momusic.com/artista`)
 4. **Contas opcionais** para sincronizar playlists entre dispositivos
-5. **Upload para nuvem** opcional para quem quiser publicar sem manter o site no ar
+5. **Publicação na nuvem** para as músicas tocarem em outros aparelhos — a conta e o banco de dados já têm roteiro pronto na seção [Armazenamento e banco de dados](#-armazenamento-e-banco-de-dados-guia-de-quem-comprou-o-site)
 
 ---
 
