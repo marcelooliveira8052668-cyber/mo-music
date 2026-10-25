@@ -133,6 +133,9 @@ function AdicionarMusicaForm() {
   /* Eu guardo a letra colada pelo artista. */
   const [letra, setLetra] = useState('')
 
+  /* Eu guardo o gênero digitado (vale para todos os arquivos escolhidos). */
+  const [genero, setGenero] = useState('')
+
   /* Eu controlo o destaque da área de arraste. */
   const [arrastando, setArrastando] = useState(false)
 
@@ -324,7 +327,9 @@ function AdicionarMusicaForm() {
         artista: artistaFinal,
         capa: capa ? URL.createObjectURL(capa) : null,
         audio: urlAudio,
-        categoria: 'Do meu computador',
+
+        /* Eu uso o gênero digitado ou a origem padrão da anexação. */
+        categoria: genero.trim() || 'Do meu computador',
 
         /* Eu guardo o canal de venda ou apoio do artista. */
         apoio: apoio.trim() || null,
@@ -351,6 +356,7 @@ function AdicionarMusicaForm() {
     setApoio('')
     setPreco('')
     setLetra('')
+    setGenero('')
     setAviso('')
 
     /* Eu copio os arquivos para o armazenamento permanente do navegador,
@@ -764,6 +770,27 @@ function AdicionarMusicaForm() {
           </div>
 
         )}
+
+        {/* ================================= */}
+        {/* GÊNERO (VALE PARA TODAS)         */}
+        {/* ================================= */}
+
+        {/* Eu ofereço o campo de gênero enquanto há arquivos. */}
+        {arquivos.length > 0 && (
+
+          <div className="campo-form">
+            <label htmlFor="genero-musica">Gênero (opcional)</label>
+            <input
+              id="genero-musica"
+              type="text"
+              placeholder="Ex.: Rap, Sertanejo, Pop, MPB… vale para as escolhidas"
+              value={genero}
+              onChange={(evento) => setGenero(evento.target.value)}
+            />
+          </div>
+
+        )}
+
 
         {/* ================================= */}
         {/* VENDA E APOIO (OPCIONAL)          */}

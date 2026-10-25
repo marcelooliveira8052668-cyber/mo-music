@@ -77,6 +77,9 @@ function App() {
   /* Eu guardo o texto digitado na busca. */
   const [pesquisa, setPesquisa] = useState('')
 
+  /* Eu guardo o gênero escolhido na tela de busca. */
+  const [generoAtivo, setGeneroAtivo] = useState(null)
+
   /* Eu defino quantas músicas aparecem por vez. */
   const [limiteVisivel, setLimiteVisivel] = useState(24)
 
@@ -206,23 +209,48 @@ function App() {
   /* INFORMAÇÕES DERIVADAS                      */
   /* =========================================== */
 
-  /* Eu filtro as músicas conforme a busca. */
+  /* Eu filtro as músicas conforme a busca e o gênero escolhido. */
   const musicasFiltradas = useMemo(() => {
 
     /* Eu preparo o termo de pesquisa. */
     const termo = pesquisa.toLowerCase().trim()
 
-    /* Eu devolvo a lista inteira quando a busca está vazia. */
-    if (!termo) return listaMusicas
+    /* Eu mantenho a lista filtrada por texto e gênero em conjunto. */
+    return listaMusicas.filter((musica) => {
 
-    /* Eu retorno somente título, artista ou categoria compatíveis. */
-    return listaMusicas.filter((musica) =>
-      (musica.titulo ?? '').toLowerCase().includes(termo) ||
-      (musica.artista ?? '').toLowerCase().includes(termo) ||
-      (musica.categoria ?? '').toLowerCase().includes(termo)
-    )
+      /* Eu confiro se a música bate com o texto digitado. */
+      const bateNoTexto = !termo ||
+        (musica.titulo ?? '').toLowerCase().includes(termo) ||
+        (musica.artista ?? '').toLowerCase().includes(termo) ||
+        (musica.categoria ?? '').toLowerCase().includes(termo)
 
-  }, [listaMusicas, pesquisa])
+      /* Eu confiro se a música pertence ao gênero escolhido. */
+      const bateNoGenero = !generoAtivo ||
+        (musica.categoria ?? '') === generoAtivo
+
+      return bateNoTexto && bateNoGenero
+
+    })
+
+  }, [listaMusicas, pesquisa, generoAtivo])
+
+  /* Eu listo os gêneros da biblioteca com a quantidade de faixas. */
+  const generos = useMemo(() => {
+
+    /* Eu conto as faixas de cada categoria. */
+    const contagem = new Map()
+    listaMusicas.forEach((musica) => {
+      const nome = (musica.categoria ?? '').trim()
+      if (!nome) return
+      contagem.set(nome, (contagem.get(nome) ?? 0) + 1)
+    })
+
+    /* Eu devolvo os gêneros em ordem alfabética. */
+    return [...contagem.entries()]
+      .map(([nome, total]) => ({ nome, total }))
+      .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
+
+  }, [listaMusicas])
 
   /* Eu seleciono as músicas visíveis na tela. */
   const musicasVisiveis = musicasFiltradas.slice(0, limiteVisivel)
@@ -420,6 +448,11 @@ function App() {
   /* Eu carrego mais 24 músicas na lista. */
   function carregarMaisMusicas() {
     setLimiteVisivel((limite) => limite + 24)
+  }
+
+  /* Eu escolho (ou desligo) um gênero na tela de busca. */
+  function alternarGenero(nome) {
+    setGeneroAtivo((atual) => (atual === nome ? null : nome))
   }
 
 
@@ -1244,6 +1277,9 @@ function App() {
     limparPesquisa,
     pesquisarArtista,
     inputBuscaRef,
+    generos,
+    generoAtivo,
+    alternarGenero,
     /* Navegação */
     visao,
     irPara,
@@ -1787,15 +1823,116 @@ function VisaoBusca() {
     artistasDestaque,
     pesquisarArtista,
     tocarConjunto,
-    limparPesquisa
+    limparPesquisa,
+    generos,
+    generoAtivo,
+    alternarGenero
   } = useApp()
 
   /* Eu retorno a tela de busca. */
   return (
     <div className="tela tela-busca">
 
+      {/* ================================= */}
+      {/* BUSCA POR GÊNERO                  */}
+      {/* ================================= */}
+
+      {/* Eu ofereço os gêneros da biblioteca como atalhos. */}
+      <section className="prateleira">
+        <div className="cabecalho-prateleira">
+          <h2>Explore por gênero</h2>
+        </div>
+
+        <div className="lista-generos">
+
+          {/* Eu crio o chip que limpa o filtro. */}
+          <button
+            type="button"
+            className={`chip-genero ${generoAtivo ? '' : 'ativo'}`}
+            onClick={() => alternarGenero(null)}
+          >
+            Todos
+          </button>
+
+          {/* Eu listo cada gênero encontrado na biblioteca. */}
+          {generos.map((genero) => (
+            <button
+              key={genero.nome}
+              type="button"
+              className={`chip-genero ${generoAtivo === genero.nome ? 'ativo' : ''}`}
+              onClick={() => alternarGenero(genero.nome)}
+            >
+              {genero.nome}
+              <small>{genero.total}</small>
+            </button>
+          ))}
+
+        </div>
+      </section>
+
+
       {/* Eu verifico se o usuário ainda não digitou nada. */}
       {!pesquisa.trim() ? (
+
+        generoAtivo ? (
+
+          <>
+
+            {/* Eu apresento as faixas do gênero escolhido. */}
+            <div className="cabecalho-prateleira">
+              <h2>{generoAtivo}</h2>
+              <span className="contagem-resultados">
+                {musicasFiltradas.length}{' '}
+                {musicasFiltradas.length === 1 ? 'faixa' : 'faixas'} neste gênero
+              </span>
+            </div>
+
+            {/* Eu mostro as faixas do gênero. */}
+            {musicasFiltradas.length > 0 ? (
+              <ListaMusicas
+                musicas={musicasVisiveis}
+                conjunto={musicasFiltradas}
+              />
+            ) : (
+
+              /* Eu aviso quando o gênero está vazio. */
+              <div className="estado-vazio">
+                <h3>Nenhuma faixa em “{generoAtivo}”</h3>
+                <p>Escolha outro gênero ou clique em Todos.</p>
+              </div>
+
+            )}
+
+            {/* Eu carrego mais faixas do gênero. */}
+            {existemMaisMusicas && (
+              <div className="area-carregar-mais">
+                <button
+                  type="button"
+                  className="botao-secundario"
+                  onClick={carregarMaisMusicas}
+                >
+                  Carregar mais faixas
+                </button>
+              </div>
+            )}
+
+            {/* Eu ofereço o botão de tocar o gênero inteiro. */}
+            {musicasFiltradas.length > 1 && (
+              <div className="area-acao-principal">
+                <button
+                  type="button"
+                  className="botao-verde-grande"
+                  onClick={() => tocarConjunto(musicasFiltradas)}
+                >
+                  <IconeTocar />
+                  Tocar todo o gênero
+                </button>
+              </div>
+            )}
+
+          </>
+
+        ) : (
 
         <>
 
@@ -1841,6 +1978,8 @@ function VisaoBusca() {
           )}
 
         </>
+
+        )
 
       ) : (
 

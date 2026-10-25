@@ -808,6 +808,52 @@ img {
   font-size: 13.5px;
 }
 
+/* Chaves de gênero na tela de busca. */
+.lista-generos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip-genero {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 999px;
+  background: var(--cor-superficie);
+  color: var(--cor-texto-secundario);
+  font-size: 0.85rem;
+  transition:
+    color 0.18s,
+    border-color 0.18s,
+    background-color 0.18s,
+    transform 0.15s;
+}
+
+.chip-genero small {
+  font-size: 0.72rem;
+  opacity: 0.75;
+}
+
+.chip-genero:hover {
+  color: var(--cor-texto);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+}
+
+.chip-genero.ativo {
+  background: var(--cor-destaque);
+  border-color: var(--cor-destaque);
+  color: #000;
+  font-weight: 600;
+}
+
+.chip-genero.ativo small {
+  opacity: 0.85;
+}
+
 /* Grade de cards musicais. */
 .grade-musicas {
   display: grid;
