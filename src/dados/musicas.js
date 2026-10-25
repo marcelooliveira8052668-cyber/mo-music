@@ -231,32 +231,6 @@ const audioFormulaMagica =
 /* Eu mantenho os cadastros manuais separados da biblioteca automática. */
 export const musicas = [
 
-  /* Eu cadastro a segunda música da Fatica. */
-  {
-    id: 2,
-    titulo: 'Minha Segunda Música',
-    artista: 'Fatica',
-    capa: null,
-
-    /* Eu ainda não tenho o áudio desta música. */
-    audio: null,
-
-    categoria: 'Música independente'
-  },
-
-  /* Eu cadastro a terceira música da Fatica. */
-  {
-    id: 3,
-    titulo: 'Minha Terceira Música',
-    artista: 'Fatica',
-    capa: null,
-
-    /* Eu ainda não tenho o áudio desta música. */
-    audio: null,
-
-    categoria: 'Música independente'
-  },
-
   /* Eu cadastro a música dos Racionais MC's. */
   {
     id: 4,

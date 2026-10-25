@@ -12,8 +12,12 @@ import {
   IconeCoracao,
   IconeMais,
   IconeCompartilhar,
-  IconeCompra
+  IconeCompra,
+  IconeLixeira
 } from './Icones'
+
+/* Eu importo a regra de propriedade das músicas. */
+import { ehAnexadaMinha } from './utilitarios'
 
 
 /* ============================================= */
@@ -46,7 +50,8 @@ function ListaMusicas({ musicas, conjunto, mostrarIndice = true }) {
     alternarFavorita,
     abrirAdicionarAPlaylist,
     compartilhar,
-    comprarMusica
+    comprarMusica,
+    excluirAnexada
   } = useApp()
 
   /* Eu retorno a estrutura visual da lista. */
@@ -192,6 +197,19 @@ function ListaMusicas({ musicas, conjunto, mostrarIndice = true }) {
               >
                 <IconeMais />
               </button>
+
+              {/* Eu mostro o botão de excluir só para o dono da música. */}
+              {ehAnexadaMinha(musica) && (
+                <button
+                  type="button"
+                  className="botao-acao botao-acao-perigo"
+                  onClick={() => excluirAnexada(musica)}
+                  aria-label="Excluir esta música deste aparelho"
+                  title="Excluir deste aparelho (só você vê esta opção)"
+                >
+                  <IconeLixeira />
+                </button>
+              )}
 
             </span>
 

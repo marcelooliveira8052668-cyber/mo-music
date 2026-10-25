@@ -7,6 +7,9 @@
 import { useState } from 'react'
 import { useApp } from './contexto'
 
+/* Eu importo a identidade configurável da plataforma. */
+import { NOME_PLATAFORMA, RODAPE_PLATAFORMA } from './configuracao'
+
 /* Eu importo os ícones da navegação. */
 import {
   IconeInicio,
@@ -93,7 +96,7 @@ function BarraLateral() {
         </span>
 
         {/* Eu mostro o nome da plataforma. */}
-        <strong>M.O Music</strong>
+        <strong>{NOME_PLATAFORMA}</strong>
 
       </div>
 
@@ -258,7 +261,7 @@ function BarraLateral() {
 
       {/* Eu identifico o projeto no rodapé. */}
       <p className="rodape-lateral">
-        Projeto de portfólio · React + Vite
+        {RODAPE_PLATAFORMA}
       </p>
 
     </aside>

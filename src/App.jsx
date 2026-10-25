@@ -29,6 +29,12 @@ import ModalPlaylists from './ModalPlaylists'
 /* Eu importo o catálogo oficial de músicas. */
 import { catalogo } from './dados/musicas'
 
+/* Eu importo as ferramentas de armazenamento permanente. */
+import { listarAnexadas, removerAnexada } from './armazenamento'
+
+/* Eu importo a identidade configurável da plataforma. */
+import { NOME_PLATAFORMA } from './configuracao'
+
 /* Eu importo as utilidades da aplicação. */
 import {
   lerArmazenamento,
@@ -721,35 +727,52 @@ function App() {
   /* ADIÇÃO DE MÚSICAS                           */
   /* =========================================== */
 
-  /* Eu adiciono várias músicas enviadas pelo usuário de uma vez. */
-  function adicionarMusicas(novasMusicas) {
+  /* Eu adiciono várias músicas enviadas pelo usuário de uma vez.
+     O segundo argumento (opções) permite carregar sem tocar, que é
+     o caso da restauração automática ao abrir o site. */
+  function adicionarMusicas(novasMusicas, opcoes = {}) {
 
     /* Eu encerro quando a lista está vazia. */
     if (!novasMusicas.length) return
 
+    /* Eu separo só as músicas que ainda não estão na biblioteca,
+       para anexações repetidas não duplicarem nada. */
+    const idsExistentes = new Set(listaMusicas.map((musica) => musica.id))
+    const realmenteNovas = novasMusicas.filter(
+      (musica) => !idsExistentes.has(musica.id)
+    )
+
+    /* Eu encerro quando tudo já estava presente. */
+    if (!realmenteNovas.length) return
+
     /* Eu preparo os ids das novas faixas. */
-    const ids = novasMusicas.map((musica) => musica.id)
+    const ids = realmenteNovas.map((musica) => musica.id)
 
     /* Eu incluo as músicas no início da biblioteca. */
-    setListaMusicas((lista) => [...novasMusicas, ...lista])
+    setListaMusicas((lista) => [...realmenteNovas, ...lista])
 
     /* Eu incluo as músicas no início da fila. */
     setOrdemAtual((filaAtual) => [...ids, ...filaAtual])
 
-    /* Eu coloco a primeira música nova no player. */
-    setMusicaAtual(novasMusicas[0])
+    /* Eu só mexo no player quando o chamador pedir (padrão: sim). */
+    if (opcoes.tocar !== false) {
 
-    /* Eu peço o início automático. */
-    setContadorTocar((contador) => contador + 1)
+      /* Eu coloco a primeira música nova no player. */
+      setMusicaAtual(realmenteNovas[0])
 
-    /* Eu limpo a busca para facilitar a visualização. */
-    setPesquisa('')
+      /* Eu peço o início automático. */
+      setContadorTocar((contador) => contador + 1)
 
-    /* Eu reinicio a paginação. */
-    setLimiteVisivel(24)
+      /* Eu limpo a busca para facilitar a visualização. */
+      setPesquisa('')
 
-    /* Eu levo o usuário até a biblioteca. */
-    setVisao('biblioteca')
+      /* Eu reinicio a paginação. */
+      setLimiteVisivel(24)
+
+      /* Eu levo o usuário até a biblioteca. */
+      setVisao('biblioteca')
+
+    }
 
   }
 
@@ -757,6 +780,113 @@ function App() {
   function adicionarNovaMusica(novaMusica) {
     adicionarMusicas([novaMusica])
   }
+
+
+  /* =========================================== */
+  /* EXCLUSÃO DE MÚSICAS ANEXADAS (SÓ DO DONO)   */
+  /* =========================================== */
+
+  /* Eu apago uma música anexada deste aparelho.
+     O botão só existe para quem anexou — quem recebe o link
+     do site vê e ouve a música, mas nunca o botão de excluir. */
+  async function excluirAnexada(musica) {
+
+    /* Eu tiro a música da biblioteca. */
+    setListaMusicas((lista) =>
+      lista.filter((item) => item.id !== musica.id))
+
+    /* Eu tiro a música da fila de reprodução. */
+    setOrdemAtual((fila) => fila.filter((id) => id !== musica.id))
+
+    /* Eu tiro a música das curtidas. */
+    setFavoritas((lista) => lista.filter((id) => id !== musica.id))
+
+    /* Eu tiro a música de todas as playlists. */
+    setPlaylists((lista) =>
+      lista.map((playlist) => ({
+        ...playlist,
+        musicas: playlist.musicas.filter((id) => id !== musica.id)
+      }))
+    )
+
+    /* Eu paro o player se a música apagada estava tocando. */
+    setMusicaAtual((atual) => (atual?.id === musica.id ? null : atual))
+
+    /* Eu apago o registro permanente do navegador. */
+    try {
+      await removerAnexada(musica.id)
+    } catch {
+      /* Eu sigo mesmo se o banco falhar — a biblioteca já mudou. */
+    }
+
+    /* Eu libero a memória dos endereços temporários. */
+    if (musica.audio?.startsWith('blob:')) URL.revokeObjectURL(musica.audio)
+    if (musica.capa?.startsWith('blob:')) URL.revokeObjectURL(musica.capa)
+
+    /* Eu confirmo a exclusão para o usuário. */
+    setAvisoGlobal(`"${musica.titulo}" foi apagada deste aparelho.`)
+
+  }
+
+
+  /* =========================================== */
+  /* RESTAURAÇÃO DAS MÚSICAS ANEXADAS            */
+  /* =========================================== */
+
+  /* Eu recarrego as músicas anexadas guardadas no navegador. */
+  useEffect(() => {
+
+    /* Eu preparo a marcação de cancelamento. */
+    let cancelado = false
+
+    /* Eu disparo a restauração sem travar a abertura. */
+    async function restaurarAnexadas() {
+
+      try {
+
+        /* Eu leio os registros guardados no banco. */
+        const anexadas = await listarAnexadas()
+        if (cancelado || !anexadas.length) return
+
+        /* Eu recrio os endereços de áudio (Blob vira URL). */
+        const restauradas = anexadas.map((registro) => ({
+          id: registro.id,
+          titulo: registro.titulo,
+          artista: registro.artista,
+          capa: registro.capa ? URL.createObjectURL(registro.capa) : null,
+          audio: URL.createObjectURL(registro.audio),
+          categoria: registro.categoria ?? 'Do meu computador',
+          apoio: registro.apoio ?? null,
+          preco: registro.preco ?? null,
+          letra: registro.letra ?? null
+        }))
+
+        /* Eu incluo no início da biblioteca sem tocar nada. */
+        setListaMusicas((lista) => {
+          const atuais = new Set(lista.map((musica) => musica.id))
+          const novas = restauradas.filter((musica) => !atuais.has(musica.id))
+          return novas.length ? [...novas, ...lista] : lista
+        })
+
+      } catch {
+        /* Eu sigo sem as anexadas quando o armazenamento falha. */
+      }
+
+    }
+
+    restaurarAnexadas()
+
+    /* Eu cancelo a leitura quando o app fecha. */
+    return () => { cancelado = true }
+
+  }, [])
+
+  /* Eu aplico a marca configurada ao título da aba do navegador. */
+  useEffect(() => {
+
+    document.title = `${NOME_PLATAFORMA} — Sua música, do seu jeito`
+
+  }, [])
 
 
   /* =========================================== */
@@ -1107,6 +1237,7 @@ function App() {
     carregarMaisMusicas,
     adicionarNovaMusica,
     adicionarMusicas,
+    excluirAnexada,
     /* Busca */
     pesquisa,
     atualizarPesquisa,
@@ -1594,7 +1725,7 @@ function VisaoInicio() {
       <section className="prateleira">
 
         <div className="cabecalho-prateleira">
-          <h2>Destaques da M.O Music</h2>
+          <h2>Destaques da {NOME_PLATAFORMA}</h2>
 
           {/* Eu ofereço um atalho para a biblioteca completa. */}
           <button

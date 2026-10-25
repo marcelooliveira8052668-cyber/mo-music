@@ -3,6 +3,9 @@
 /* ARQUIVO: src/utilitarios.js                   */
 /* ============================================= */
 
+/* Eu importo a identidade configurável da plataforma. */
+import { NOME_PLATAFORMA, NOME_CURTO } from './configuracao'
+
 /* Eu defino o prefixo das chaves para não colidir com outros sites. */
 const PREFIXO = 'momusic:'
 
@@ -113,7 +116,22 @@ export function matizDeTexto(texto) {
 export function estiloDeGradiente(texto) {
 
   /* Eu devolvo a variável CSS usada pelo degradê. */
-  return { '--matiz': String(matizDeTexto(texto || 'm.o music')) }
+  return { '--matiz': String(matizDeTexto(texto || NOME_CURTO)) }
+
+}
+
+
+/* ============================================= */
+/* PROPRIEDADE DAS MÚSICAS ANEXADAS              */
+/* ============================================= */
+
+/* Eu verifico se a música foi anexada por quem está usando este aparelho.
+   Só o dono vê e usa o botão de excluir: quem recebe o link do site
+   participa ouvindo e comprando, mas não apaga nada de mais ninguém. */
+export function ehAnexadaMinha(musica) {
+
+  /* Eu reconheço o dono pela marca anexada- no identificador. */
+  return typeof musica?.id === 'string' && musica.id.startsWith('anexada-')
 
 }
 
@@ -167,7 +185,7 @@ function descobrirExtensao(endereco, tipoBlob) {
 export async function compartilharMusica(musica) {
 
   /* Eu preparo a mensagem de divulgação. */
-  const texto = `Ouça "${musica.titulo}" de ${musica.artista} — descobri no M.O Music`
+  const texto = `Ouça "${musica.titulo}" de ${musica.artista} — descobri no ${NOME_PLATAFORMA}`
 
   /* Eu preparo o link do site quando existir. */
   const link =

@@ -13,11 +13,12 @@ import {
   IconeCoracao,
   IconeMais,
   IconeCompartilhar,
-  IconeCompra
+  IconeCompra,
+  IconeLixeira
 } from './Icones'
 
-/* Eu importo as utilidades de cor. */
-import { estiloDeGradiente } from './utilitarios'
+/* Eu importo as utilidades de cor e propriedade. */
+import { estiloDeGradiente, ehAnexadaMinha } from './utilitarios'
 
 /* Eu crio o cartão visual que representa uma música. */
 function MusicaCard({ musica, conjunto }) {
@@ -31,7 +32,8 @@ function MusicaCard({ musica, conjunto }) {
     alternarFavorita,
     abrirAdicionarAPlaylist,
     compartilhar,
-    comprarMusica
+    comprarMusica,
+    excluirAnexada
   } = useApp()
 
   /* Eu descubro se este card é a música em reprodução. */
@@ -184,6 +186,22 @@ function MusicaCard({ musica, conjunto }) {
         >
           <IconeMais />
         </button>
+
+        {/* Eu mostro o botão de excluir só para o dono da música. */}
+        {ehAnexadaMinha(musica) && (
+          <button
+            type="button"
+            className="botao-acao botao-acao-perigo"
+            onClick={(evento) => {
+              evento.stopPropagation()
+              excluirAnexada(musica)
+            }}
+            aria-label="Excluir esta música deste aparelho"
+            title="Excluir deste aparelho (só você vê esta opção)"
+          >
+            <IconeLixeira />
+          </button>
+        )}
 
       </div>
 

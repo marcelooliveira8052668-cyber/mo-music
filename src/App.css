@@ -167,16 +167,21 @@ img {
 .logotipo-icone {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: var(--cor-destaque);
   color: #000;
 }
 
+.logotipo-icone svg {
+  width: 20px;
+  height: 20px;
+}
+
 .logotipo strong {
-  font-size: 20px;
-  letter-spacing: -0.4px;
+  font-size: 18px;
+  letter-spacing: -0.3px;
 }
 
 /* Navegação principal. */
@@ -648,8 +653,8 @@ img {
 .botao-acao {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   color: var(--cor-texto-secundario);
   opacity: 0;
@@ -659,7 +664,7 @@ img {
 .botao-acao:hover {
   color: var(--cor-texto);
   background: rgba(255, 255, 255, 0.1);
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 .botao-acao.curtida {
@@ -668,8 +673,8 @@ img {
 }
 
 .botao-acao svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 .botao-acao:disabled {
@@ -826,13 +831,21 @@ img {
   gap: 4px;
   padding: 14px;
   border-radius: var(--raio);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   background: var(--cor-superficie);
-  transition: background-color 0.25s;
+  transition:
+    background-color 0.25s,
+    transform 0.25s,
+    border-color 0.25s,
+    box-shadow 0.25s;
   overflow: hidden;
 }
 
 .musica-card:hover {
   background: var(--cor-hover);
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
 }
 
 .musica-card.em-reproducao {
@@ -870,21 +883,21 @@ img {
   text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-/* Botão verde que aparece no hover (como no Spotify). */
+/* Botão verde de play que sobe no hover do card. */
 .botao-play-card {
   position: absolute;
   right: 10px;
   bottom: 10px;
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: var(--cor-destaque);
   color: #000;
   opacity: 0;
   transform: translateY(10px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
   transition: opacity 0.25s, transform 0.25s, background-color 0.2s;
 }
 
@@ -900,8 +913,8 @@ img {
 }
 
 .botao-play-card svg {
-  width: 22px;
-  height: 22px;
+  width: 19px;
+  height: 19px;
 }
 
 /* Textos do card. */
@@ -1392,8 +1405,8 @@ img {
 .icone-solta {
   display: grid;
   place-items: center;
-  width: 58px;
-  height: 58px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   background: rgba(30, 215, 96, 0.15);
   color: var(--cor-destaque);
@@ -1566,6 +1579,28 @@ img {
   margin: 0;
   color: var(--cor-destaque);
   font-size: 13.5px;
+}
+
+/* Eu organizo o modo pasta abaixo da área de envio. */
+.opcoes-formulario {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* Eu deixo o botão da pasta no mesmo tamanho dos secundários. */
+.botao-pasta {
+  font-size: 0.95rem;
+}
+
+/* Eu explico o modo pasta em letra pequena. */
+.opcoes-formulario small {
+  color: var(--cor-texto-secundario);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  max-width: 560px;
 }
 
 .botao-enviar {
@@ -1921,6 +1956,13 @@ img {
 /* Eu pinto de verde o botão de compra nos cards e linhas. */
 .botao-acao-destaque {
   color: var(--cor-destaque);
+  opacity: 1;
+}
+
+/* Eu pinto de vermelho o botão de excluir (só para o dono). */
+.botao-acao-perigo:hover,
+.botao-acao-perigo:focus-visible {
+  color: #f15e5e;
   opacity: 1;
 }
 
@@ -2461,4 +2503,25 @@ img {
   .contador-ranque {
     display: none;
   }
+}
+
+
+/* ============================================= */
+/* AJUSTE FINO — VISUAL REFINADO                 */
+/* ============================================= */
+
+/* Eu uniformizo os ícones de navegação e listas em tamanho sóbrio. */
+.item-navegacao svg,
+.botao-miniatura svg,
+.lista-playlists svg,
+.cabecalho-playlists svg {
+  width: 19px;
+  height: 19px;
+}
+
+/* Eu aperto os títulos para ar de produto premium. */
+h1,
+h2,
+h3 {
+  letter-spacing: -0.015em;
 }

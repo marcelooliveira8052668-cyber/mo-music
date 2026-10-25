@@ -4,16 +4,33 @@
 /* ============================================= */
 
 /* Eu importo os recursos do React. */
-import { useState, useRef } from 'react'
-
-/* Eu importo o leitor de metadados da biblioteca. */
-import { lerMetadadosMusica } from './dados/musicas'
+import { useState, useRef, useEffect } from 'react'
 
 /* Eu importo o estado compartilhado da aplicação. */
 import { useApp } from './contexto'
 
 /* Eu importo os ícones do formulário. */
 import { IconeMais, IconeFechar, IconeTocar } from './Icones'
+
+/* Eu importo o catálogo automático para não duplicar arquivos da pasta. */
+import { musicasAutomaticas } from './dados/musicas'
+
+/* Eu importo o leitor de etiquetas (seguro: só em envio de um arquivo). */
+import { lerMetadadosMusica } from './dados/musicas'
+
+/* Eu importo as ferramentas de armazenamento local do navegador. */
+import {
+  salvarAnexada,
+  suportaPasta,
+  escolherPasta,
+  salvarHandlePasta,
+  lerHandlePasta,
+  permissaoDaPasta,
+  pedirPermissaoDaPasta,
+  colecionarAudiosDaPasta,
+  solicitarPermanencia,
+  verificarEspaco
+} from './armazenamento'
 
 
 /* ============================================= */
@@ -28,6 +45,59 @@ function ehAudio(arquivo) {
 
   /* Eu aceito também pelas extensões conhecidas. */
   return /\.(mp3|m4a|ogg|wav|flac|aac)$/i.test(arquivo.name)
+
+}
+
+
+/* ============================================= */
+/* IDENTIFICAÇÃO ESTÁVEL DAS MÚSICAS ANEXADAS    */
+/* ============================================= */
+
+/* Eu monto o identificador estável de uma música anexada.
+   O mesmo arquivo sempre gera o mesmo id — assim nada duplica,
+   nem entre sessões, nem entre o modo cópia e o modo pasta. */
+function idDaAnexada(arquivo) {
+
+  /* Eu combino nome e tamanho, que identificam o arquivo na prática. */
+  return `anexada-${arquivo.name}-${arquivo.size}`
+
+}
+
+/* Eu separo "Artista - Título" quando o nome do arquivo segue o padrão. */
+function separarNomeArquivo(arquivo) {
+
+  /* Eu removo a extensão e troco sublinhado por espaço. */
+  const nome = arquivo.name.replace(/\.[^/.]+$/, '').replace(/_/g, ' ')
+
+  /* Eu só aceito o padrão quando as duas partes têm conteúdo. */
+  const partes = nome.split(' - ')
+  if (partes.length >= 2 && partes[0].trim() && partes[1].trim()) {
+    return { artista: partes[0].trim(), titulo: partes.slice(1).join(' - ').trim() }
+  }
+
+  /* Eu mantenho o nome inteiro como título quando não há padrão. */
+  return { artista: 'Artista Independente', titulo: nome }
+
+}
+
+/* Eu monto o cadastro de uma música anexada direto do arquivo. */
+function montarMusicaAnexada(arquivo) {
+
+  /* Eu identifico artista e título pelo nome do arquivo. */
+  const nome = separarNomeArquivo(arquivo)
+
+  /* Eu devolvo o cadastro pronto para a biblioteca. */
+  return {
+    id: idDaAnexada(arquivo),
+    titulo: nome.titulo,
+    artista: nome.artista,
+    capa: null,
+    audio: URL.createObjectURL(arquivo),
+    categoria: 'Do meu computador',
+    apoio: null,
+    preco: null,
+    letra: null
+  }
 
 }
 
@@ -71,6 +141,16 @@ function AdicionarMusicaForm() {
 
   /* Eu crio a referência do campo de arquivos. */
   const inputArquivosRef = useRef(null)
+
+  /* Eu guardo se o navegador atual suporta o modo pasta. */
+  const [temModoPasta] = useState(() => suportaPasta())
+
+  /* Eu controlo o botão de reconexão da pasta salva. */
+  const [pastaReconectavel, setPastaReconectavel] = useState(false)
+
+  /* Eu guardo a referência mais recente da função de integração da pasta
+     para o efeito de abertura usar sem reiniciar a cada render. */
+  const integrarPastaRef = useRef(null)
 
 
   /* =========================================== */
@@ -226,22 +306,20 @@ function AdicionarMusicaForm() {
       if (arquivos.length === 1) {
         if (titulo.trim()) tituloFinal = titulo.trim()
         if (artista.trim()) artistaFinal = artista.trim()
-      }
+      } else {
 
-      /* Eu tento enriquecer o cadastro com os dados internos. */
-      if (arquivos.length > 1) {
-        try {
-          const dados = await lerMetadadosMusica(urlAudio)
-          if (dados.titulo) tituloFinal = dados.titulo
-          if (dados.artista) artistaFinal = dados.artista
-        } catch {
-          /* Eu mantenho o nome do arquivo quando não há etiquetas. */
-        }
+        /* Em envios em massa eu leio o padrão "Artista - Título" direto
+           do nome do arquivo — sem abrir cada música, porque baixar 600
+           arquivos para ler etiquetas travava a página inteira. */
+        const nome = separarNomeArquivo(arquivo)
+        tituloFinal = nome.titulo
+        artistaFinal = nome.artista
+
       }
 
       /* Eu monto o cadastro completo. */
       novasMusicas.push({
-        id: `anexada-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        id: idDaAnexada(arquivo),
         titulo: tituloFinal,
         artista: artistaFinal,
         capa: capa ? URL.createObjectURL(capa) : null,
@@ -274,6 +352,224 @@ function AdicionarMusicaForm() {
     setPreco('')
     setLetra('')
     setAviso('')
+
+    /* Eu copio os arquivos para o armazenamento permanente do navegador,
+       para continuarem lá depois que a página for fechada. */
+    await guardarNoNavegador(novasMusicas, arquivos)
+
+  }
+
+
+  /* =========================================== */
+  /* GRAVAÇÃO PERMANENTE NO NAVEGADOR            */
+  /* =========================================== */
+
+  /* Eu copio os arquivos anexados para o armazenamento do navegador. */
+  async function guardarNoNavegador(novasMusicas, arquivosSelecionados) {
+
+    /* Eu evito o trabalho quando não há música. */
+    if (!novasMusicas.length) return
+
+    /* Eu peço ao navegador para tratar o armazenamento como permanente,
+       reduzindo o risco de ele apagar os dados em limpezas automáticas. */
+    solicitarPermanencia()
+
+    /* Eu somo o espaço que a cópia vai ocupar. */
+    const bytesTotal = arquivosSelecionados.reduce(
+      (soma, arquivo) => soma + arquivo.size, 0)
+
+    try {
+
+      /* Eu confiro se existe espaço antes de começar. */
+      const espaco = await verificarEspaco(bytesTotal)
+      if (!espaco.suficiente) {
+        setAviso('O navegador não tem espaço para copiar estas músicas. Elas seguem na biblioteca desta sessão; para manter sem copiar nada, use o modo "Escolher pasta de músicas".')
+        return
+      }
+
+      /* Eu percorro os arquivos copiando um a um. */
+      const total = novasMusicas.length
+      for (let indice = 0; indice < total; indice += 1) {
+
+        /* Eu preparo os dados do registro. */
+        const musica = novasMusicas[indice]
+        const arquivo = arquivosSelecionados[indice]
+
+        /* Eu gravo a música inteira (metadados + arquivo) no banco local. */
+        await salvarAnexada({
+          id: musica.id,
+          titulo: musica.titulo,
+          artista: musica.artista,
+          categoria: musica.categoria,
+          apoio: musica.apoio,
+          preco: musica.preco,
+          letra: musica.letra,
+          nomeArquivo: arquivo.name,
+          tamanho: arquivo.size,
+          tipoArquivo: arquivo.type,
+          criadoEm: Date.now(),
+          audio: arquivo,
+          capa: capa || null
+        })
+
+        /* Eu mostro o andamento de tempos em tempos para não pesar. */
+        if (indice % 5 === 0 || indice === total - 1) {
+          setAviso(`Salvando no navegador: ${indice + 1} de ${total}...`)
+        }
+
+      }
+
+      /* Eu confirmo o fim da cópia. */
+      setAviso(total === 1
+        ? 'Música salva neste aparelho — continua aqui depois que você fechar o site.'
+        : `${total} músicas salvas neste aparelho — continuam aqui depois que você fechar o site.`)
+
+    } catch (erro) {
+
+      /* Eu explico o caso clássico de espaço esgotado no meio da cópia. */
+      if (erro?.name === 'QuotaExceededError') {
+        setAviso('O navegador ficou sem espaço durante a cópia. Use o modo "Escolher pasta de músicas" para manter tudo sem copiar.')
+      } else {
+        setAviso('Não deu para salvar no navegador agora — as músicas seguem funcionando nesta sessão.')
+      }
+
+    }
+
+  }
+
+
+  /* =========================================== */
+  /* MODO PASTA (Chrome/Edge)                    */
+  /* =========================================== */
+
+  /* Eu carrego os arquivos da pasta na biblioteca, sem copiar nada. */
+  async function integrarPasta(handle) {
+
+    /* Eu aviso que a leitura começou. */
+    setAviso('Lendo a pasta de músicas...')
+
+    /* Eu coleciono os áudios encontrados (inclusive em subpastas). */
+    const arquivosDaPasta = await colecionarAudiosDaPasta(handle)
+
+    /* Eu identifico os arquivos que já estão no catálogo automático,
+       que é o caso quando o app roda na máquina do dono da pasta. */
+    const nomesNoCatalogo = new Set(
+      musicasAutomaticas.map((musica) => musica.id.split('/').pop())
+    )
+
+    /* Eu monto só as músicas que ainda não estão na biblioteca. */
+    const musicasDaPasta = arquivosDaPasta
+      .filter((arquivo) => !nomesNoCatalogo.has(arquivo.name))
+      .map((arquivo) => montarMusicaAnexada(arquivo))
+
+    /* Eu adiciono tudo sem começar a tocar (a página pode ter acabado de abrir). */
+    adicionarMusicas(musicasDaPasta, { tocar: false })
+
+    /* Eu desligo o botão de reconexão e confirmo o carregamento. */
+    setPastaReconectavel(false)
+    setAviso(musicasDaPasta.length
+      ? `${musicasDaPasta.length} músicas da pasta carregadas — direto da pasta, sem copiar nada.`
+      : 'Nenhuma música nova encontrada na pasta.')
+
+  }
+
+  /* Eu guardo a versão mais recente para o efeito de abertura usar. */
+  useEffect(() => {
+
+    integrarPastaRef.current = integrarPasta
+
+  })
+
+  /* Eu leio a pasta salva assim que o formulário abre. */
+  useEffect(() => {
+
+    /* Eu só continuo em navegadores com suporte à API de pastas. */
+    if (!suportaPasta()) return undefined
+
+    /* Eu preparo a marcação de cancelamento do efeito. */
+    let cancelado = false
+
+    /* Eu disparo a reconexão sem travar a abertura da página. */
+    async function reconectarAutomaticamente() {
+
+      try {
+
+        /* Eu recupero o endereço da última pasta usada. */
+        const handle = await lerHandlePasta()
+        if (!handle || cancelado) return
+
+        /* Eu pergunto se ainda podemos ler a pasta. */
+        const permissao = await permissaoDaPasta(handle)
+
+        /* Com permissão já confirmada, carrego as músicas na hora. */
+        if (permissao === 'granted') {
+          await integrarPastaRef.current?.(handle)
+          return
+        }
+
+        /* Com permissão pendente, espero o clique no botão de reconexão. */
+        if (permissao === 'prompt' && !cancelado) setPastaReconectavel(true)
+
+      } catch {
+        /* Eu ignoro falhas do banco — o app funciona sem a pasta. */
+      }
+
+    }
+
+    reconectarAutomaticamente()
+
+    /* Eu cancelo a leitura quando o componente sai da tela. */
+    return () => { cancelado = true }
+
+  }, [])
+
+  /* Eu abro a janela de escolha de pasta. */
+  async function abrirPasta() {
+
+    try {
+
+      /* Eu peço a pasta para o usuário. */
+      const handle = await escolherPasta()
+
+      /* Eu guardo o endereço para reconectar sozinho da próxima vez. */
+      await salvarHandlePasta(handle)
+
+      /* Eu carrego os áudios encontrados. */
+      await integrarPasta(handle)
+
+    } catch (erro) {
+
+      /* Eu silencio o cancelamento da janela e aviso os erros reais. */
+      if (erro?.name !== 'AbortError') {
+        setAviso('Não deu para abrir a pasta escolhida.')
+      }
+
+    }
+
+  }
+
+  /* Eu reconecto a última pasta quando o navegador pede confirmação. */
+  async function reconectarPasta() {
+
+    try {
+
+      /* Eu recupero o endereço salvo. */
+      const handle = await lerHandlePasta()
+      if (!handle) return
+
+      /* Eu peço a permissão (só funciona vindo de um clique). */
+      const permissao = await pedirPermissaoDaPasta(handle)
+
+      /* Eu carrego as músicas quando autorizado. */
+      if (permissao === 'granted') {
+        await integrarPasta(handle)
+      } else {
+        setAviso('A pasta ficou sem permissão de leitura — escolha outra pasta se quiser.')
+      }
+
+    } catch {
+      setAviso('Não deu para reconectar a pasta.')
+    }
 
   }
 
@@ -341,6 +637,37 @@ function AdicionarMusicaForm() {
           />
 
         </div>
+
+
+        {/* ================================= */}
+        {/* MODO PASTA (Chrome/Edge)          */}
+        {/* ================================= */}
+
+        {/* Eu ofereço o modo pasta para quem tem muitas músicas. */}
+        {temModoPasta && (
+
+          <div className="opcoes-formulario">
+
+            {/* Eu crio o botão da pasta (conexão ou reconexão). */}
+            <button
+              type="button"
+              className="botao-secundario botao-pasta"
+              onClick={pastaReconectavel ? reconectarPasta : abrirPasta}
+            >
+              {pastaReconectavel
+                ? '📁 Reconectar minha pasta de músicas'
+                : '📁 Escolher pasta de músicas (sem copiar)'}
+            </button>
+
+            {/* Eu explico o que o modo pasta faz. */}
+            <small>
+              No Chrome/Edge a pasta conecta direto: não gasta espaço nem copia nada.
+              Em outros navegadores, anexe os arquivos — eles ficam guardados no aparelho.
+            </small>
+
+          </div>
+
+        )}
 
 
         {/* ================================= */}

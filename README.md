@@ -1,6 +1,6 @@
 # 🎵 M.O Music
 
-**Uma plataforma de música estilo Spotify — feita para qualquer pessoa colocar as próprias músicas, compartilhar com amigos e receber apoio ou pagamento, sem cadastro e sem servidor.**
+**Uma plataforma de música completa — feita para qualquer pessoa colocar as próprias músicas, compartilhar com amigos e receber apoio ou pagamento, sem cadastro e sem servidor.**
 
 > 🟢 **Demonstração pública:** o site vem com 5 faixas royalty-free para visitantes clicarem em **▶ Tocar** e ouvirem na hora.
 > 🎧 **No seu computador:** a biblioteca local com centenas de arquivos de áudio é carregada automaticamente — e nunca é enviada para a internet.
@@ -9,7 +9,7 @@
 
 ## ✨ O que a plataforma faz
 
-### 🎧 Player completo (estilo Spotify)
+### 🎧 Player completo
 - Barra de player fixa no rodapé com play/pausa, próxima/anterior, barra de progresso arrastável e volume
 - **Aleatório** e **repetir** (fila inteira ou uma música só)
 - **Fila de reprodução** com as próximas faixas
@@ -121,8 +121,22 @@ No seu computador, tudo funciona normalmente: basta rodar `npm run dev`.
 ## 🔒 Privacidade
 
 - **Nenhum arquivo de áudio sai do seu computador**
+- Músicas anexadas ficam guardadas no próprio navegador (IndexedDB) ou conectadas direto à pasta (Chrome/Edge), e voltam sozinhas ao abrir o site
+- Só quem anexou vê e usa o botão de excluir — quem recebe o link do site ouve e compra, mas não apaga nada
 - Favoritos, playlists, histórico, volume e preferências ficam no `localStorage` do seu navegador (prefixo `momusic:`)
 - A única requisição externa é a busca de letras (nome de artista + título), feita apenas quando você toca uma música sem letra salva
+
+---
+
+## 🎁 Entregando o site a um cliente (cópia limpa)
+
+O site **nasce limpo**: nenhuma música anexada por você vai junto — as músicas de cada pessoa ficam guardadas só no navegador dela, nunca nos arquivos do site. Para entregar:
+
+1. **Troque a marca** em `src/configuracao.js` (nome da plataforma, nome curto e rodapé) e, se quiser, o `<title>` do `index.html`. O site inteiro passa a usar a marca nova.
+2. **Não envie a pasta `src/assets/musicas/`** — é a biblioteca pessoal do dono e já é ignorada pelo Git (fica só na máquina de quem desenvolveu).
+3. Pronto: o cliente abre o site e anexa as músicas **do computador dele** (arrastando os arquivos ou conectando a pasta, no Chrome/Edge). Tudo funciona: playlists, letras, compartilhamento, Pix e exclusão (só ele vê o botão de excluir, pois só ele anexou).
+
+As 5 faixas de demonstração (Kevin MacLeod, CC BY 4.0) servem de vitrine. Para removê-las, esvazie o array de `src/dados/demonstracao.js`.
 
 ---
 
