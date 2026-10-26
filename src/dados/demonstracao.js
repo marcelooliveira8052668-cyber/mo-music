@@ -17,11 +17,11 @@
  */
 
 /* Eu importo os arquivos de áudio de demonstração. */
-import sneakySnitch from '../assets/demonstracao/sneaky-snitch.mp3'
-import electrodoodle from '../assets/demonstracao/electrodoodle.mp3'
-import carefree from '../assets/demonstracao/carefree.mp3'
-import vibeAce from '../assets/demonstracao/vibe-ace.mp3'
-import hyperfun from '../assets/demonstracao/hyperfun.mp3'
+const sneakySnitch = '/demonstracao/sneaky-snitch.mp3'
+const electrodoodle = '/demonstracao/electrodoodle.mp3'
+const carefree = '/demonstracao/carefree.mp3'
+const vibeAce = '/demonstracao/vibe-ace.mp3'
+const hyperfun = '/demonstracao/hyperfun.mp3'
 
 
 /* ============================================= */
@@ -82,3 +82,4 @@ export const musicasDemonstracao = [
   }
 
 ]
+

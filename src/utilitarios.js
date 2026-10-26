@@ -18,7 +18,8 @@ export const CHAVES = {
   volume: 'volume',
   aleatorio: 'aleatorio',
   repetir: 'repetir',
-  painelLetra: 'painelLetra'
+  painelLetra: 'painelLetra',
+  buscarCapas: 'buscarCapas'
 }
 
 

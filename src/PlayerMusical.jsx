@@ -64,8 +64,12 @@ function PlayerMusical() {
     painelLetra,
     alternarPainelLetra,
     estadoLetra,
-    salvarLetra
+    salvarLetra,
+    capaDe
   } = useApp()
+
+  /* Eu busco a capa da faixa: a do arquivo ou a da internet. */
+  const capaAtual = capaDe(musicaAtual)
 
   /* Eu guardo um rascunho de letra por faixa. */
   const [rascunhosLetra, setRascunhosLetra] = useState({})
@@ -412,10 +416,15 @@ function PlayerMusical() {
   /* INTERFACE DO PLAYER                         */
   /* =========================================== */
 
+  /* Eu calculo o preenchimento visual das barras de progresso e volume. */
+  const percentualProgresso =
+    duracao > 0 ? Math.min(100, Math.max(0, (tempoAtual / duracao) * 100)) : 0
+
+  const percentualVolume = Math.min(100, Math.max(0, volume))
+
   /* Eu retorno a estrutura visual do player. */
   return (
     <section className="player-musical" aria-label="Player de música">
-
       {/* Eu crio o elemento de áudio do navegador. */}
       <audio
         ref={audioRef}
@@ -440,11 +449,12 @@ function PlayerMusical() {
       <div className="zona-player zona-esquerda">
 
         {/* Eu exibo a capa quando ela existe. */}
-        {musicaAtual?.capa ? (
+        {capaAtual ? (
           <img
             className="capa-player"
-            src={musicaAtual.capa}
+            src={capaAtual}
             alt={`Capa de ${musicaAtual.titulo}`}
+            decoding="async"
           />
         ) : (
           <span className="capa-player capa-player-gradiente" aria-hidden="true">♪</span>
@@ -459,6 +469,14 @@ function PlayerMusical() {
             {musicaAtual?.artista || 'Escolha uma faixa para começar'}
           </small>
         </div>
+
+        {/* Eu mostro as barrinhas: animadas enquanto toca, paradas quando pausa. */}
+        <span
+          className={`equalizador-player ${tocando ? '' : 'parado'}`}
+          aria-hidden="true"
+        >
+          <i /><i /><i /><i /><i />
+        </span>
 
         {/* Eu crio o botão de curtir a faixa atual. */}
         <button
@@ -614,6 +632,7 @@ function PlayerMusical() {
             disabled={duracao <= 0 || !musicaAtual?.audio}
             onChange={alterarPosicao}
             className="barra-progresso-player"
+            style={{ '--progresso': `${percentualProgresso}%` }}
             aria-label="Posição da música"
           />
 
@@ -662,6 +681,7 @@ function PlayerMusical() {
           value={volume}
           onChange={alterarVolume}
           className="barra-volume"
+          style={{ '--progresso': `${percentualVolume}%` }}
           aria-label="Volume"
         />
 

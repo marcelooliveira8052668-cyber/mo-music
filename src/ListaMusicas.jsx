@@ -51,7 +51,8 @@ function ListaMusicas({ musicas, conjunto, mostrarIndice = true }) {
     abrirAdicionarAPlaylist,
     compartilhar,
     comprarMusica,
-    excluirAnexada
+    excluirAnexada,
+    capaDe
   } = useApp()
 
   /* Eu retorno a estrutura visual da lista. */
@@ -76,6 +77,9 @@ function ListaMusicas({ musicas, conjunto, mostrarIndice = true }) {
 
         /* Eu descubro se esta faixa está curtida. */
         const curtida = ehFavorita(musica.id)
+
+        /* Eu busco a capa: a do arquivo ou a encontrada na internet. */
+        const capa = capaDe(musica)
 
         /* Eu devolvo uma linha da lista. */
         return (
@@ -116,8 +120,8 @@ function ListaMusicas({ musicas, conjunto, mostrarIndice = true }) {
             <span className="coluna-titulo">
 
               {/* Eu mostro a capa reduzida da faixa. */}
-              {musica.capa ? (
-                <img className="capa-miniatura" src={musica.capa} alt="" />
+              {capa ? (
+                <img className="capa-miniatura" src={capa} alt="" loading="lazy" decoding="async" />
               ) : (
                 <span className="capa-miniatura capa-miniatura-gradiente" aria-hidden="true">♪</span>
               )}

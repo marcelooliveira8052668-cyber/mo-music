@@ -32,6 +32,9 @@ import { catalogo } from './dados/musicas'
 /* Eu importo as ferramentas de armazenamento permanente. */
 import { listarAnexadas, removerAnexada } from './armazenamento'
 
+/* Eu importo a busca de capas na internet. */
+import { buscarCapa, capaConhecida } from './capas'
+
 /* Eu importo a identidade configurável da plataforma. */
 import { NOME_PLATAFORMA } from './configuracao'
 
@@ -64,6 +67,12 @@ import {
 /* ============================================= */
 /* COMPONENTE PRINCIPAL                          */
 /* ============================================= */
+
+/* Eu descubro o modificador de teclado do sistema (⌘ no Mac, Ctrl no resto). */
+const MODIFICADOR_TECLADO =
+  typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.platform || '')
+    ? '⌘'
+    : 'Ctrl'
 
 /* Eu crio o componente principal da M.O Music. */
 function App() {
@@ -145,6 +154,14 @@ function App() {
     () => lerArmazenamento(CHAVES.painelLetra, true)
   )
 
+  /* Eu guardo as capas descobertas na internet (id → endereço). */
+  const [capasInternet, setCapasInternet] = useState({})
+
+  /* Eu guardo a preferência de buscar capas na internet. */
+  const [buscarCapas, setBuscarCapas] = useState(
+    () => lerArmazenamento(CHAVES.buscarCapas, true)
+  )
+
   /* Eu guardo as letras encontradas na internet. */
   const [cacheLetras, setCacheLetras] = useState({})
 
@@ -207,6 +224,9 @@ function App() {
 
   /* Eu salvo a preferência do painel de letra. */
   useEffect(() => guardarArmazenamento(CHAVES.painelLetra, painelLetra), [painelLetra])
+
+  /* Eu salvo a preferência de busca de capas na internet. */
+  useEffect(() => guardarArmazenamento(CHAVES.buscarCapas, buscarCapas), [buscarCapas])
 
 
   /* =========================================== */
@@ -933,6 +953,61 @@ function App() {
 
 
   /* =========================================== */
+  /* CAPAS PELA INTERNET                        */
+  /* =========================================== */
+
+  /* Eu ligo e desligo a busca de capas na internet. */
+  function alternarBuscarCapas() {
+    setBuscarCapas((estado) => !estado)
+  }
+
+  /* Eu devolvo a capa de uma música: embutida, da internet ou nenhuma. */
+  const capaDe = useCallback((musica) => {
+
+    /* Eu encerro quando não há música. */
+    if (!musica) return null
+
+    /* Eu uso primeiro a arte do arquivo e depois a encontrada na rede. */
+    return musica.capa || capasInternet[musica.id] || capaConhecida(musica) || null
+
+  }, [capasInternet])
+
+  /* Eu procuro capas para as músicas que não têm imagem embutida. */
+  useEffect(() => {
+
+    /* Eu respeito a escolha de quem usa o site. */
+    if (!buscarCapas) return
+
+    /* Eu preparo a marcação de cancelamento. */
+    let vivo = true
+
+    /* Eu escolho até 150 músicas ainda sem capa nesta rodada. */
+    const pendentes = listaMusicas
+      .filter((musica) => !musica.capa && !capaConhecida(musica))
+      .slice(0, 150)
+
+    /* Eu disparo as buscas: a fila limita as conexões simultâneas. */
+    pendentes.forEach((musica) => {
+
+      buscarCapa(musica).then((capa) => {
+
+        /* Eu ignoro respostas da tela anterior ou busca sem resultado. */
+        if (!vivo || !capa) return
+
+        /* Eu guardo a capa encontrada para exibir na hora. */
+        setCapasInternet((atual) => ({ ...atual, [musica.id]: capa }))
+
+      })
+
+    })
+
+    /* Eu descarto as respostas quando a biblioteca muda de tela. */
+    return () => { vivo = false }
+
+  }, [listaMusicas, buscarCapas])
+
+
+  /* =========================================== */
   /* AVISOS RÁPIDOS                              */
   /* =========================================== */
 
@@ -1341,6 +1416,10 @@ function App() {
     tocadasRecentemente,
     maisTocadas,
     artistasDestaque,
+    /* Capas da internet */
+    capaDe,
+    buscarCapas,
+    alternarBuscarCapas,
     /* Divulgação e compra */
     compartilhar,
     comprarMusica,
@@ -1427,6 +1506,9 @@ function App() {
                 </button>
               )}
 
+              {/* Eu mostro o atalho de teclado enquanto o campo está livre. */}
+              {!pesquisa && <kbd className="atalho-teclado">{MODIFICADOR_TECLADO} K</kbd>}
+
             </div>
 
             {/* Eu mostro o perfil do visitante com painel funcional. */}
@@ -1474,6 +1556,22 @@ function App() {
                         : 'Nenhuma música anexada ainda.'}
                     </p>
 
+                    {/* Eu ofereço o controle de privacidade das capas. */}
+                    <label className="opcao-capas">
+                      <input
+                        type="checkbox"
+                        checked={buscarCapas}
+                        onChange={alternarBuscarCapas}
+                      />
+                      <span>
+                        <strong>Buscar capas na internet</strong>
+                        <small>
+                          Mostra a arte de cada música quando o arquivo não
+                          tem imagem. Desligue para usar 100% offline.
+                        </small>
+                      </span>
+                    </label>
+
                     {/* Eu ofereço o atalho para colocar músicas. */}
                     <button
                       type="button"
@@ -1501,7 +1599,7 @@ function App() {
           {/* ÁREA DE CONTEÚDO                    */}
           {/* ----------------------------------- */}
 
-          <main className="conteudo">
+          <main className="conteudo" key={visao}>
 
             {/* Eu troco a tela de acordo com a navegação. */}
             {visao === 'inicio' && <VisaoInicio />}

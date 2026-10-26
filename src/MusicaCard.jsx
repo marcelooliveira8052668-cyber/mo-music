@@ -33,7 +33,8 @@ function MusicaCard({ musica, conjunto }) {
     abrirAdicionarAPlaylist,
     compartilhar,
     comprarMusica,
-    excluirAnexada
+    excluirAnexada,
+    capaDe
   } = useApp()
 
   /* Eu descubro se este card é a música em reprodução. */
@@ -44,6 +45,9 @@ function MusicaCard({ musica, conjunto }) {
 
   /* Eu verifico se a música possui áudio disponível. */
   const temAudio = Boolean(musica.audio)
+
+  /* Eu busco a capa: a do arquivo ou a encontrada na internet. */
+  const capa = capaDe(musica)
 
   /* Eu crio o degradê exclusivo deste card. */
   const degradê = estiloDeGradiente(
@@ -73,8 +77,13 @@ function MusicaCard({ musica, conjunto }) {
       <div className="capa-card">
 
         {/* Eu exibo a capa original quando existe. */}
-        {musica.capa ? (
-          <img src={musica.capa} alt={`Capa de ${musica.titulo}`} />
+        {capa ? (
+          <img
+            src={capa}
+            alt={`Capa de ${musica.titulo}`}
+            loading="lazy"
+            decoding="async"
+          />
         ) : (
 
           /* Eu exibo um degradê com a nota da marca. */
