@@ -19,4 +19,16 @@ export const NOME_PLATAFORMA = 'M.O Music'
 export const NOME_CURTO = 'm.o music'
 
 /* Eu defino a assinatura mostrada no rodapé da barra lateral. */
-export const RODAPE_PLATAFORMA = 'Projeto de portfólio · React + Vite'
+export const RODAPE_PLATAFORMA = 'Música independente · Ouça, compartilhe e apoie'
+
+/* Preencha apenas com informações que a artista autorizou publicar.
+   Imagens em public/ podem usar: `${import.meta.env.BASE_URL}artista/foto.jpg`. */
+export const ARTISTA = {
+  nome: 'Espaço da artista',
+  apresentacao: 'Um lugar para compartilhar músicas, histórias e novas criações.',
+  biografia: 'Em breve, conheça a artista e as histórias por trás de suas músicas.',
+  foto: '',
+  pix: '',
+  nomeRecebedor: '',
+  linkApoio: '', // Somente um endereço https:// de um serviço de pagamento.
+}

@@ -108,6 +108,15 @@ function BarraLateral() {
       {/* Eu agrupo os links principais. */}
       <nav className="navegacao-principal" aria-label="Navegação principal">
 
+        <button
+          type="button"
+          className={`item-navegacao ${estaAtiva('artista') ? 'ativo' : ''}`}
+          onClick={() => irPara('artista')}
+        >
+          <IconeLogotipo />
+          <span>Página da artista</span>
+        </button>
+
         {/* Eu crio o link de início. */}
         <button
           type="button"
@@ -115,7 +124,7 @@ function BarraLateral() {
           onClick={() => irPara('inicio')}
         >
           <IconeInicio />
-          <span>Início</span>
+          <span>Explorar biblioteca</span>
         </button>
 
         {/* Eu crio o link de busca. */}

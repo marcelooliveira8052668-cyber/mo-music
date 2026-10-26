@@ -168,7 +168,7 @@ async function procurarNoPais(musica, pais) {
     /* Eu escolho o melhor item e devolvo a capa. */
     return escolherCapa(dados?.results, musica)
 
-  } catch (erro) {
+  } catch {
 
     /* Eu conto a falha de rede para parar insistindo. */
     falhasSeguidas += 1

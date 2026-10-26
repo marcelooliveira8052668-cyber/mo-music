@@ -25,6 +25,7 @@ import ListaMusicas from './ListaMusicas'
 import PlayerMusical from './PlayerMusical'
 import AdicionarMusicaForm from './AdicionarMusicaForm'
 import ModalPlaylists from './ModalPlaylists'
+import PaginaArtista from './PaginaArtista'
 
 /* Eu importo o catálogo oficial de músicas. */
 import { catalogo } from './dados/musicas'
@@ -36,7 +37,7 @@ import { listarAnexadas, removerAnexada } from './armazenamento'
 import { buscarCapa, capaConhecida } from './capas'
 
 /* Eu importo a identidade configurável da plataforma. */
-import { NOME_PLATAFORMA } from './configuracao'
+import { NOME_PLATAFORMA, ARTISTA } from './configuracao'
 
 /* Eu importo as utilidades da aplicação. */
 import {
@@ -94,7 +95,10 @@ function App() {
   const [limiteVisivel, setLimiteVisivel] = useState(24)
 
   /* Eu guardo a música que está no player. */
-  const [musicaAtual, setMusicaAtual] = useState(catalogo[0] ?? null)
+  const [musicaAtual, setMusicaAtual] = useState(() => {
+    const id = new URLSearchParams(window.location.search).get('musica')
+    return catalogo.find((musica) => musica.publicada && musica.id === id) ?? catalogo[0] ?? null
+  })
 
   /* Eu conto os pedidos de início automático de faixa. */
   const [contadorTocar, setContadorTocar] = useState(0)
@@ -138,7 +142,7 @@ function App() {
   )
 
   /* Eu identifico qual tela está aberta. */
-  const [visao, setVisao] = useState('inicio')
+  const [visao, setVisao] = useState('artista')
 
   /* Eu guardo a playlist aberta no momento. */
   const [playlistAtiva, setPlaylistAtiva] = useState(null)
@@ -151,7 +155,7 @@ function App() {
 
   /* Eu controlo a visibilidade do painel de letra. */
   const [painelLetra, setPainelLetra] = useState(
-    () => lerArmazenamento(CHAVES.painelLetra, true)
+    () => lerArmazenamento(CHAVES.painelLetra, false)
   )
 
   /* Eu guardo as capas descobertas na internet (id → endereço). */
@@ -947,7 +951,7 @@ function App() {
   /* Eu aplico a marca configurada ao título da aba do navegador. */
   useEffect(() => {
 
-    document.title = `${NOME_PLATAFORMA} — Sua música, do seu jeito`
+    document.title = `${ARTISTA.nome} | ${NOME_PLATAFORMA}`
 
   }, [])
 
@@ -983,7 +987,7 @@ function App() {
 
     /* Eu escolho até 150 músicas ainda sem capa nesta rodada. */
     const pendentes = listaMusicas
-      .filter((musica) => !musica.capa && !capaConhecida(musica))
+      .filter((musica) => !musica.publicada && !musica.capa && !capaConhecida(musica))
       .slice(0, 150)
 
     /* Eu disparo as buscas: a fila limita as conexões simultâneas. */
@@ -1105,7 +1109,8 @@ function App() {
     try {
       await navigator.clipboard.writeText(canal)
     } catch {
-      /* O navegador pode bloquear a cópia automática. */
+      mostrarAviso(`Não foi possível copiar. Chave de apoio: ${canal}`)
+      return
     }
 
     /* Eu oriento o ouvinte sobre o próximo passo. */
@@ -1602,6 +1607,7 @@ function App() {
           <main className="conteudo" key={visao}>
 
             {/* Eu troco a tela de acordo com a navegação. */}
+            {visao === 'artista' && <PaginaArtista />}
             {visao === 'inicio' && <VisaoInicio />}
             {visao === 'busca' && <VisaoBusca />}
             {visao === 'biblioteca' && <VisaoBiblioteca />}
@@ -1629,11 +1635,11 @@ function App() {
 
           <button
             type="button"
-            className={visao === 'inicio' ? 'ativo' : ''}
-            onClick={() => irPara('inicio')}
+            className={visao === 'artista' ? 'ativo' : ''}
+            onClick={() => irPara('artista')}
           >
             <IconeInicio />
-            <span>Início</span>
+            <span>Artista</span>
           </button>
 
           <button
@@ -2566,6 +2572,12 @@ function VisaoAnexar() {
         <h1>Tocar do meu computador</h1>
         <p>Seus arquivos ficam no seu aparelho — nada é enviado para a internet.</p>
       </header>
+
+      <div className="artista-painel">
+        <h2>Anexar não é publicar</h2>
+        <p>Esta área serve para ouvir arquivos neste aparelho. Para aparecer na página pública do artista, a música precisa ser hospedada e incluída no catálogo do site pelo responsável pela publicação.</p>
+        <p>O modelo atual é personalizado nos arquivos do projeto. Ele não possui contas de artistas, painel de publicação online nem entrega automática de downloads pagos.</p>
+      </div>
 
       {/* Eu apresento o formulário. */}
       <AdicionarMusicaForm />

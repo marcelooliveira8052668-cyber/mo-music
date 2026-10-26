@@ -4,7 +4,7 @@
 /* ============================================= */
 
 /* Eu importo a identidade configurável da plataforma. */
-import { NOME_PLATAFORMA, NOME_CURTO } from './configuracao'
+import { NOME_PLATAFORMA, NOME_CURTO, ARTISTA } from './configuracao'
 
 /* Eu defino o prefixo das chaves para não colidir com outros sites. */
 const PREFIXO = 'momusic:'
@@ -183,10 +183,46 @@ function descobrirExtensao(endereco, tipoBlob) {
 }
 
 /* Eu comparto a música com amigos usando o celular ou o computador. */
+export function linkPaginaArtista(musicaId) {
+  const url = new URL(window.location.href)
+  url.search = ''
+  url.hash = ''
+  if (musicaId) url.searchParams.set('musica', musicaId)
+  return url.href
+}
+
+async function compartilharLink(titulo, texto, url) {
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: titulo, text: texto, url })
+      return 'texto'
+    }
+    await navigator.clipboard.writeText(`${texto} ${url}`)
+    return 'copiado'
+  } catch (erro) {
+    if (erro?.name === 'AbortError') return 'cancelado'
+    try {
+      await navigator.clipboard.writeText(`${texto} ${url}`)
+      return 'copiado'
+    } catch {
+      return 'erro'
+    }
+  }
+}
+
+export function compartilharPaginaArtista() {
+  return compartilharLink(ARTISTA.nome, `Conheça as músicas de ${ARTISTA.nome} no ${NOME_PLATAFORMA}.`, linkPaginaArtista())
+}
+
 export async function compartilharMusica(musica) {
 
   /* Eu preparo a mensagem de divulgação. */
   const texto = `Ouça "${musica.titulo}" de ${musica.artista} — descobri no ${NOME_PLATAFORMA}`
+
+  /* Faixas públicas compartilham o link, sem baixar ou enviar o áudio inteiro. */
+  if (musica.publicada) {
+    return compartilharLink(musica.titulo, texto, linkPaginaArtista(musica.id))
+  }
 
   /* Eu preparo o link do site quando existir. */
   const link =

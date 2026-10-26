@@ -9,6 +9,8 @@ import jsmediatags from 'jsmediatags/dist/jsmediatags.min.js'
 
 /* Eu importo as faixas de demonstração liberadas para publicação. */
 import { musicasDemonstracao } from './demonstracao'
+import { musicasPublicadas } from './publicadas'
+import { arquivosDeAudio } from './arquivosLocais'
 
 
 /* ============================================= */
@@ -96,19 +98,8 @@ export async function lerMetadadosMusica(urlAudio) {
 /* ============================================= */
 
 /* Eu localizo os arquivos musicais na pasta do projeto. */
-const arquivosDeAudio = import.meta.glob(
-  '../assets/musicas/*.{mp3,m4a,ogg,wav}',
-  {
-    /* Eu carrego os caminhos dos arquivos imediatamente. */
-    eager: true,
-
-    /* Eu solicito as URLs dos arquivos. */
-    query: '?url',
-
-    /* Eu importo diretamente o endereço de cada áudio. */
-    import: 'default'
-  }
-)
+/* A configuração do Vite usa um módulo vazio no build público.
+   Assim, arquivos pessoais não entram no dist/, mesmo nesta máquina. */
 
 /* ============================================= */
 /* ORGANIZAÇÃO DOS NOMES DAS MÚSICAS             */
@@ -270,6 +261,7 @@ const musicasAutomaticasUnicas = musicasAutomaticas.filter(
 
 /* Eu monto o catálogo completo usado por toda a aplicação. */
 export const catalogo = [
+  ...musicasPublicadas,
   ...musicasManuaisComConteudo,
   ...musicasDemonstracao,
   ...musicasAutomaticasUnicas

@@ -17,11 +17,11 @@
  */
 
 /* Eu importo os arquivos de áudio de demonstração. */
-const sneakySnitch = '/demonstracao/sneaky-snitch.mp3'
-const electrodoodle = '/demonstracao/electrodoodle.mp3'
-const carefree = '/demonstracao/carefree.mp3'
-const vibeAce = '/demonstracao/vibe-ace.mp3'
-const hyperfun = '/demonstracao/hyperfun.mp3'
+const sneakySnitch = `${import.meta.env.BASE_URL}demonstracao/sneaky-snitch.mp3`
+const electrodoodle = `${import.meta.env.BASE_URL}demonstracao/electrodoodle.mp3`
+const carefree = `${import.meta.env.BASE_URL}demonstracao/carefree.mp3`
+const vibeAce = `${import.meta.env.BASE_URL}demonstracao/vibe-ace.mp3`
+const hyperfun = `${import.meta.env.BASE_URL}demonstracao/hyperfun.mp3`
 
 
 /* ============================================= */

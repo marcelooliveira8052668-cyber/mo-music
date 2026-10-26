@@ -436,6 +436,7 @@ img {
 
 /* Botões redondos de navegação. */
 .botao-circular {
+  flex-shrink: 0;
   display: grid;
   place-items: center;
   width: 34px;
@@ -460,6 +461,7 @@ img {
 
 /* Campo de busca do topo. */
 .campo-busca-topo {
+  min-width: 0;
   position: relative;
   display: flex;
   align-items: center;
@@ -489,6 +491,7 @@ img {
 }
 
 .campo-busca-topo input {
+  width: 100%;
   flex: 1;
   min-width: 0;
   background: none;
